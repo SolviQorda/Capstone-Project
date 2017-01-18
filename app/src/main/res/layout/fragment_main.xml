@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             xmlns:ads="http:schemas.android.com/apk/res-auto"
+             xmlns:app="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+
+    <!--&lt;!&ndash;<android.support.design.widget.AppBarLayout&ndash;&gt;-->
+        <!--&lt;!&ndash;android:id="@+id/appbar"&ndash;&gt;-->
+        <!--&lt;!&ndash;android:layout_width="match_parent"&ndash;&gt;-->
+        <!--&lt;!&ndash;android:layout_height="wrap_content">&ndash;&gt;-->
+
+        <!--&lt;!&ndash;<android.support.v7.widget.Toolbar&ndash;&gt;-->
+            <!--&lt;!&ndash;android:layout_width="match_parent"&ndash;&gt;-->
+            <!--&lt;!&ndash;android:layout_height="?attr/actionBarSize"&ndash;&gt;-->
+            <!--&lt;!&ndash;android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">&ndash;&gt;-->
+
+
+        <!--&lt;!&ndash;</android.support.v7.widget.Toolbar>&ndash;&gt;-->
+
+
+    <!--</android.support.design.widget.AppBarLayout>-->
+
+
+
+    <android.support.v7.widget.RecyclerView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/recyclerview_cards"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+
+    >
+
+    </android.support.v7.widget.RecyclerView>
+
+    <com.google.android.gms.ads.AdView
+        android:id="@+id/adView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_gravity="bottom|center"
+        ads:adSize="BANNER"
+        ads:adUnitId="@string/adUnitId"
+    />
+</FrameLayout>

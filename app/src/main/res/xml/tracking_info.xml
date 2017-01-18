@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ga_trackingId">UA-89965502-1</string>
+    <bool name="ga_autoActivityTracking">True</bool>
+    <screenName name="qorda_projects.tracktive.MainActivity">Card View</screenName>
+    <screenName name="qorda_projects.tracktive.DetailActivity">Looking at an article</screenName>
+    <screenName name="qorda_projects.tracktive.DiaryActivity">Diary view</screenName>
+</resources>

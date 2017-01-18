@@ -17,6 +17,9 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    buildTypes.each {
+        it.buildConfigField 'String', 'EVENT_REGISRTY_API_KEY', "\"cbd08a04-677e-4fed-a921-dc3207d72819\""
+    }
 }
 
 dependencies {
@@ -25,5 +28,10 @@ dependencies {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
     compile 'com.android.support:appcompat-v7:25.0.1'
+    compile 'com.google.android.gms:play-services:10.0.1'
+    compile 'com.android.support:support-v4:25.0.1'
+    compile 'com.android.support:recyclerview-v7:25.0.1'
+    compile 'com.android.support:design:25.0.1'
+    compile 'com.squareup.okhttp3:okhttp:3.5.0'
     testCompile 'junit:junit:4.12'
 }

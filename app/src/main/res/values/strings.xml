@@ -1,3 +1,17 @@
 <resources>
     <string name="app_name">Tracktive</string>
+
+    <!-- NEW CARD DIALOG -->
+    <string name="build_new_card">Build a New Card</string>
+    <string name="name_the_card_prompt">Name the card</string>
+    <string name="eg_search_term">search term, e.g. refugees</string>
+    <string name="additional_term">additional search term</string>
+    <string name="make_card">Make Card</string>
+
+    <!--Error dialog-->
+
+    <string name="adUnitId">ca-app-pub-3940256099942544/6300978111</string>
+
+    <string name="action_settings">Settings</string>
+
 </resources>
