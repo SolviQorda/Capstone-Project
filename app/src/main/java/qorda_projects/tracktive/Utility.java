@@ -28,4 +28,14 @@ public class Utility {
         }
         return keywordsString;
     }
+
+    public static int bookmarkedOrNot(int bookmarked){
+        int iconResource = 0;
+        if (bookmarked == 1) {
+            return R.drawable.ic_bookmark_green;
+        } else {
+            return R.drawable.ic_bookmark_black_48dp;
+        }
+
+    }
 }

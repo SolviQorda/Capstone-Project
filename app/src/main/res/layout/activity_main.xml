@@ -51,7 +51,15 @@
         android:id="@+id/main_pager"
         android:layout_height="fill_parent"
         android:layout_width="match_parent"
-        android:layout_below="@+id/main_tabs"/>
+        android:layout_below="@+id/main_tabs">
+
+        <fragment
+            android:id="@+id/stories_fragment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:name="qorda_projects.tracktive.CardFragment"/>
+
+        </android.support.v4.view.ViewPager>
 
 
 </RelativeLayout>

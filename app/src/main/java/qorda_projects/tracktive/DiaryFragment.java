@@ -8,6 +8,5 @@ import android.app.Fragment;
 
 public class DiaryFragment extends Fragment {
 
-    @Override
 
 }

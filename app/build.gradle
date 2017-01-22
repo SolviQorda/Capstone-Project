@@ -4,12 +4,13 @@ android {
     compileSdkVersion 25
     buildToolsVersion "24.0.3"
     defaultConfig {
-        applicationId "qorda_projects.tracktive"
+        applicationId "qorda_projects.tracktive.app"
         minSdkVersion 13
         targetSdkVersion 25
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        multiDexEnabled true
     }
     buildTypes {
         release {
@@ -18,7 +19,7 @@ android {
         }
     }
     buildTypes.each {
-        it.buildConfigField 'String', 'EVENT_REGISRTY_API_KEY', "\"cbd08a04-677e-4fed-a921-dc3207d72819\""
+        it.buildConfigField 'String', 'EVENT_REGISTRY_API_KEY', "\"cbd08a04-677e-4fed-a921-dc3207d72819\""
     }
 }
 
@@ -34,4 +35,7 @@ dependencies {
     compile 'com.android.support:design:25.0.1'
     compile 'com.squareup.okhttp3:okhttp:3.5.0'
     testCompile 'junit:junit:4.12'
+    compile 'com.jakewharton:butterknife:8.4.0'
+    annotationProcessor 'com.jakewharton:butterknife-compiler:8.4.0'
+
 }

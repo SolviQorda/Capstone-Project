@@ -40,9 +40,9 @@ public class CardsContract {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
 
-        public static String getKeywordsFromUri(Uri uri) {
-            return uri.getPathSegments().get(//TODO: find path segments that correspond to keywords  );
-        }
+//        public static String g®etKeywordsFromUri(Uri uri) {
+//            return uri.getPathSegments().get(//TODO: find path segments that correspond to keywords  );
+//        }
     }
 
     public static final class DiaryEntry implements BaseColumns {
@@ -63,10 +63,10 @@ public class CardsContract {
         public static Uri buildDiaryUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
-
-        public static String getDiaryKeywordsFromUri(Uri uri) {
-            return uri.getPathSegments().get(//TODO: find path segments that correspond to keywords  );
-        }
+//
+//        public static String getDiaryKeywordsFromUri(Uri uri) {
+//            //return uri.getPathSegments().get(//TODO: find path segments that correspond to keywords  );
+//        }
 
     }
 

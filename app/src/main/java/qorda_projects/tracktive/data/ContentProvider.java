@@ -23,8 +23,13 @@ public class ContentProvider extends android.content.ContentProvider {
     private static final SQLiteQueryBuilder sCardsByKeywordsQueryBuilder;
     private static final SQLiteQueryBuilder sDiaryByKeywordsBuilder;
 
-    static { sCardsByKeywordsQueryBuilder = new SQLiteQueryBuilder();}
+    static { sCardsByKeywordsQueryBuilder = new SQLiteQueryBuilder();
+        sCardsByKeywordsQueryBuilder.setTables(CardsContract.CardEntry.TABLE_NAME);
+
+    }
     static { sDiaryByKeywordsBuilder = new SQLiteQueryBuilder();}
+
+
 
     //keywords = ?
     private static final String sKeywordsForCardSetting =
@@ -35,26 +40,26 @@ public class ContentProvider extends android.content.ContentProvider {
 
 
 
-    private Cursor getCardStoriesByKeywordsSetting(Uri uri, String[] projection, String sortOrder) {
-        String cardsSetting = CardsContract.CardEntry.getKeywordsFromUri(uri);
-
-        String[] selectionArgs;
-        String selection = sKeywordsForCardSetting;
-
-        //TODO: this is coming from a an array list (or a string?) so we need to make sure it ends up as an array
-
-        selectionArgs = new String[]{cardsSetting};
-
-        return sCardsByKeywordsQueryBuilder.query(mCardDbHelper.getReadableDatabase(),
-                projection,
-                selection,
-                selectionArgs,
-                null,
-                null,
-                sortOrder);
-
-
-    }
+//    private Cursor getCardStoriesByKeywordsSetting(Uri uri, String[] projection, String sortOrder) {
+//        String cardsSetting = CardsContract.CardEntry.getKeywordsFromUri(uri);
+//
+//        String[] selectionArgs;
+//        String selection = sKeywordsForCardSetting;
+//
+//        //TODO: this is coming from a an array list (or a string?) so we need to make sure it ends up as an array
+//
+//        selectionArgs = new String[]{cardsSetting};
+//
+//        return sCardsByKeywordsQueryBuilder.query(mCardDbHelper.getReadableDatabase(),
+//                projection,
+//                selection,
+//                selectionArgs,
+//                null,
+//                null,
+//                sortOrder);
+//
+//
+//    }
 
     static UriMatcher buildUriMatcher() {
         final UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
@@ -89,18 +94,18 @@ public class ContentProvider extends android.content.ContentProvider {
         }
     }
 
-    private Cursor getDiaryByCardKeyword(Uri uri, String[] projection, String sortOrder) {
-        String diaryEntrySetting = CardsContract.DiaryEntry.getDiaryKeywordsFromUri(uri);
-        String[] selectionArgs = new String[]{diaryEntrySetting};
-        return sDiaryByKeywordsBuilder.query(mCardDbHelper.getReadableDatabase(),
-                projection,
-                sDiaryForCardSetting,
-                selectionArgs,
-                null,
-                null,
-                sortOrder
-                );
-        }
+//    private Cursor getDiaryByCardKeyword(Uri uri, String[] projection, String sortOrder) {
+//        String diaryEntrySetting = CardsContract.DiaryEntry.getDiaryKeywordsFromUri(uri);
+//        String[] selectionArgs = new String[]{diaryEntrySetting};
+//        return sDiaryByKeywordsBuilder.query(mCardDbHelper.getReadableDatabase(),
+//                projection,
+//                sDiaryForCardSetting,
+//                selectionArgs,
+//                null,
+//                null,
+//                sortOrder
+//                );
+//        }
 
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {

@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">Tracktive</string>
+    <string name="content_authority">qorda_projects.tracktive.app</string>
+    <string name="sync_account_type">tracktive.qorda_projects.com</string>
 
     <!-- NEW CARD DIALOG -->
     <string name="build_new_card">Build a New Card</string>
@@ -9,6 +11,8 @@
     <string name="make_card">Make Card</string>
 
     <!--Error dialog-->
+
+    <string name="empty_story_list">No story information available, check your connection</string>
 
     <string name="adUnitId">ca-app-pub-3940256099942544/6300978111</string>
 

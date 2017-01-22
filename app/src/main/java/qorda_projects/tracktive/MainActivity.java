@@ -9,6 +9,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import qorda_projects.tracktive.sync.TracktiveSyncAdapter;
+
 public class MainActivity extends AppCompatActivity {
 
     @Override
@@ -18,11 +20,15 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.main_toolbar);
         setSupportActionBar(toolbar);
 
+        //handle whether to go to 2-pane mode or not here
+        CardFragment cardFragment = ((CardFragment)getSupportFragmentManager()
+        .findFragmentById(R.id.stories_fragment));
+
         TabLayout tabLayout = (TabLayout) findViewById(R.id.main_tabs);
 
         //find a way to cycle through card titles.
-        tabLayout.addTab(tabLayout.newTab().setText("Dakota"));
         tabLayout.addTab(tabLayout.newTab().setText("Refugees"));
+        tabLayout.addTab(tabLayout.newTab().setText("Dakota"));
         tabLayout.addTab(tabLayout.newTab().setText("EdTech"));
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
 
@@ -55,6 +61,8 @@ public class MainActivity extends AppCompatActivity {
         //TODO code to support the Pager Adapter.
 
         //TODO: instantiate fragment
+
+        TracktiveSyncAdapter.initializeSyncAdapter(this);
 
     }
 

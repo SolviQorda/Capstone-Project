@@ -16,7 +16,7 @@
            android:layout_height="match_parent"
            android:textStyle="bold"
            android:textAppearance="@style/Base.TextAppearance.AppCompat.Title"
-           android:text="shit happened the other day that wasnt so great"
+           android:text="sth happened the other day that wasnt so great"
             android:paddingBottom="@dimen/list_item_padding"/>
 
         <LinearLayout
@@ -24,12 +24,12 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
             <TextView
-                android:id="@+id/Card_story_source"
+                android:id="@+id/card_story_source"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_marginRight="@dimen/activity_horizontal_margin"
                 android:layout_marginEnd="@dimen/activity_horizontal_margin"
-                android:text="The Bullshit Merchant"
+                android:text="The BS Merchant"
             />
 
             <TextView

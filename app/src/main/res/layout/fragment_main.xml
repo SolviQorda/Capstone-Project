@@ -5,21 +5,6 @@
               android:layout_width="match_parent"
               android:layout_height="match_parent">
 
-    <!--&lt;!&ndash;<android.support.design.widget.AppBarLayout&ndash;&gt;-->
-        <!--&lt;!&ndash;android:id="@+id/appbar"&ndash;&gt;-->
-        <!--&lt;!&ndash;android:layout_width="match_parent"&ndash;&gt;-->
-        <!--&lt;!&ndash;android:layout_height="wrap_content">&ndash;&gt;-->
-
-        <!--&lt;!&ndash;<android.support.v7.widget.Toolbar&ndash;&gt;-->
-            <!--&lt;!&ndash;android:layout_width="match_parent"&ndash;&gt;-->
-            <!--&lt;!&ndash;android:layout_height="?attr/actionBarSize"&ndash;&gt;-->
-            <!--&lt;!&ndash;android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">&ndash;&gt;-->
-
-
-        <!--&lt;!&ndash;</android.support.v7.widget.Toolbar>&ndash;&gt;-->
-
-
-    <!--</android.support.design.widget.AppBarLayout>-->
 
 
 
@@ -27,11 +12,24 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/recyclerview_cards"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
 
     >
 
     </android.support.v7.widget.RecyclerView>
+
+    <TextView
+        android:id="@+id/recyclerview_stories_empty"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center_horizontal"
+        android:paddingBottom="@dimen/activity_vertical_margin"
+        android:paddingEnd="@dimen/activity_horizontal_margin"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingStart="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/activity_vertical_margin"
+        android:text="@string/empty_story_list"
+    />
 
     <com.google.android.gms.ads.AdView
         android:id="@+id/adView"

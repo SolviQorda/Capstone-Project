@@ -1,6 +1,7 @@
 package qorda_projects.tracktive.sync;
 
 import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.content.AbstractThreadedSyncAdapter;
 import android.content.ContentProviderClient;
 import android.content.ContentResolver;
@@ -78,7 +79,7 @@ public class TracktiveSyncAdapter extends AbstractThreadedSyncAdapter {
         //will contain the json response.
         String storiesJsonStr = null;
         String callbackFormat = "JSON_CALLBACK";
-        //TODO : this needs to pull a hard string from the DB hardcoded for the moment
+        //TODO : this needs to pull a hard string from the DB hardcoded for the moment but needs to be keyowrds
         String keywordsQuery = "migrants,mediterranean,deaths";
         String getArticles = "getArticles";
         String articles = "articles";
@@ -100,6 +101,7 @@ public class TracktiveSyncAdapter extends AbstractThreadedSyncAdapter {
                     .build();
 
             URL url = new URL(builtUri.toString());
+            Log.v(LOG_TAG, "ER url: " + url);
 
             //create request to EventRegisty, then open the connection.
             urlConnection = (HttpURLConnection) url.openConnection();
@@ -125,6 +127,7 @@ public class TracktiveSyncAdapter extends AbstractThreadedSyncAdapter {
                 return;
               }
             storiesJsonStr = buffer.toString();
+            Log.v(LOG_TAG, "stories JSON: " + storiesJsonStr);
             getStoriesDataFromJson(storiesJsonStr);
 
         } catch (IOException e) {
@@ -187,7 +190,7 @@ public class TracktiveSyncAdapter extends AbstractThreadedSyncAdapter {
                 //title, body, url
                 String title;
                 String body;
-                String date
+                String date;
                 String url;
                 String source;
 
@@ -250,6 +253,49 @@ public class TracktiveSyncAdapter extends AbstractThreadedSyncAdapter {
 
     private static void onAccountCreated(Account newAccount, Context context) {
         TracktiveSyncAdapter.configurePeriodicSync(context, SYNC_INTERVAL, SYNC_FLEXTIME);
+        ContentResolver.setSyncAutomatically(newAccount, context.getString(R.string.content_authority), true);
+
+        syncImmediately(context);
+    }
+
+    public static void initializeSyncAdapter(Context context) {
+        getSyncAccount(context);
+    }
+
+    public static void syncImmediately(Context context) {
+        Bundle bundle = new Bundle();
+        bundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
+        bundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
+        ContentResolver.requestSync(getSyncAccount(context), context.getString(R.string.content_authority), bundle);
+    }
+
+    /**
+     * Helper method to get the fake account to be used with SyncAdapter, or make a new one
+     * if the fake account doesn't exist yet.  If we make a new account, we call the
+     * onAccountCreated method so we can initialize things.
+     *
+     * @param context The context used to access the account service
+     * @return a fake account.
+     */
+
+    public static Account getSyncAccount(Context context) {
+        // get an istance  of the Android account manager
+        AccountManager accountManager = (AccountManager) context.getSystemService(Context.ACCOUNT_SERVICE);
+
+        //Create the accont type and default account
+        Account newAccount = new Account(context.getString(R.string.app_name), (context.getString(R.string.sync_account_type)));
+
+        //If the password doesn't exist, the account doesn't exist
+        if (null == accountManager.getPassword(newAccount)) {
+            /* add the account and account type, no password or user data. If successful, return the
+            account object, otherwise report an error.
+             */
+            if(!accountManager.addAccountExplicitly(newAccount, "", null)) {
+                return null;
+            }
+            onAccountCreated(newAccount, context);
+        }
+        return newAccount;
     }
 
 
