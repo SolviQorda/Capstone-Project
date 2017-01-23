@@ -32,8 +32,6 @@ import java.util.Vector;
 import qorda_projects.tracktive.R;
 import qorda_projects.tracktive.data.CardsContract;
 
-import static android.text.format.DateUtils.DAY_IN_MILLIS;
-
 /**
  * Created by sorengoard on 11/01/2017.
  */
@@ -42,7 +40,8 @@ public class TracktiveSyncAdapter extends AbstractThreadedSyncAdapter {
 
     public static final String LOG_TAG = TracktiveSyncAdapter.class.getSimpleName().toString();
 
-    public static final int SYNC_INTERVAL = ((int)DAY_IN_MILLIS * 1000) / 4;
+    public static final int SYNC_INTERVAL = 60;
+//            ((int)DAY_IN_MILLIS * 1000) / 4;
     public static final int SYNC_FLEXTIME = SYNC_INTERVAL/3;
 
     ContentResolver mContentResolver;
@@ -77,7 +76,7 @@ public class TracktiveSyncAdapter extends AbstractThreadedSyncAdapter {
 
         //loop the keywords
         //will contain the json response.
-        String storiesJsonStr = null;
+        String storiesJsonStr = "";
         String callbackFormat = "JSON_CALLBACK";
         //TODO : this needs to pull a hard string from the DB hardcoded for the moment but needs to be keyowrds
         String keywordsQuery = "migrants,mediterranean,deaths";

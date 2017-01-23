@@ -107,7 +107,7 @@ public class CardFragment extends Fragment implements LoaderManager.LoaderCallba
     @Override
     public Loader<Cursor> onCreateLoader(int it, Bundle bundle) {
         String sortOrder = CardsContract.CardEntry.COLUMN_DATE+ " ASC";
-        Uri cardsForKeywordUri = CardsContract.CardEntry.buildCardsUri(System.currentTimeMillis());
+        Uri cardsForKeywordUri = CardsContract.CardEntry.CONTENT_URI;
         Log.v(LOG_TAG, "cards Uri:" + cardsForKeywordUri);
 
         return new CursorLoader(getActivity(),
@@ -116,11 +116,12 @@ public class CardFragment extends Fragment implements LoaderManager.LoaderCallba
             null,
             null,
             sortOrder);
+
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
-
+        Log.v(LOG_TAG, "storyAdapter count: " + mStoryAdapter.getItemCount());
         mStoryAdapter.swapCursor(cursor);
 
 //        updateEmptyView(0;
