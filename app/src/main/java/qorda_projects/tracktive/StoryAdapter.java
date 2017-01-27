@@ -46,7 +46,7 @@ public class StoryAdapter extends RecyclerView.Adapter<StoryAdapter.StoryAdapter
             mBookmarked = (ImageButton) view.findViewById(R.id.list_item_bookmark_icon);
         }
 
-        //Handle onClick plus interface clickHandler
+        //Handle onClick ic_add interface clickHandler
 
         @Override
         public void onClick(View v) {

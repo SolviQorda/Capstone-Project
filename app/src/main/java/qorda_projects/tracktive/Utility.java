@@ -23,7 +23,7 @@ public class Utility {
 
     public static String keywordsArrayToString(ArrayList<String> keywordsList) {
         String keywordsString = "";
-        for (int i = 0; i <=keywordsList.size(); i++) {
+        for (int i = 0; i <keywordsList.size(); i++) {
             keywordsString += keywordsList.get(i) + ",";
         }
         return keywordsString;

@@ -2,8 +2,9 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
              xmlns:ads="http:schemas.android.com/apk/res-auto"
              xmlns:app="http://schemas.android.com/apk/res/android"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent">
+             android:layout_width="match_parent"
+             android:layout_height="match_parent"
+             >
 
 
 
@@ -29,6 +30,19 @@
         android:paddingStart="@dimen/activity_horizontal_margin"
         android:paddingTop="@dimen/activity_vertical_margin"
         android:text="@string/empty_story_list"
+    />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/make_card_fab"
+        android:src="@drawable/ic_plus_white_48dp"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:elevation="@dimen/toolbar_elevation"
+        android:contentDescription="@string/make_card"
+        android:layout_gravity="bottom|right"
+        android:layout_marginBottom="@dimen/fab_margin_bottom_phone"
+        android:layout_marginRight="@dimen/fab_margin_right_phone"
+
     />
 
     <com.google.android.gms.ads.AdView

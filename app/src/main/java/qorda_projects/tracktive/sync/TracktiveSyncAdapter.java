@@ -7,6 +7,7 @@ import android.content.ContentProviderClient;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.SyncRequest;
 import android.content.SyncResult;
 import android.net.Uri;
@@ -27,10 +28,14 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Set;
 import java.util.Vector;
 
 import qorda_projects.tracktive.R;
 import qorda_projects.tracktive.data.CardsContract;
+
+import static android.text.format.DateUtils.DAY_IN_MILLIS;
 
 /**
  * Created by sorengoard on 11/01/2017.
@@ -40,8 +45,8 @@ public class TracktiveSyncAdapter extends AbstractThreadedSyncAdapter {
 
     public static final String LOG_TAG = TracktiveSyncAdapter.class.getSimpleName().toString();
 
-    public static final int SYNC_INTERVAL = 60;
-//            ((int)DAY_IN_MILLIS * 1000) / 4;
+    public static final int SYNC_INTERVAL = ((int)DAY_IN_MILLIS * 1000) / 4;
+//
     public static final int SYNC_FLEXTIME = SYNC_INTERVAL/3;
 
     ContentResolver mContentResolver;
@@ -61,6 +66,22 @@ public class TracktiveSyncAdapter extends AbstractThreadedSyncAdapter {
 
     }
 
+    public ArrayList<String> getKeywords(){
+        String keywordsLabel = getContext().getResources().getString(R.string.pref_keywords_label);
+        String keywordsKey = getContext().getResources().getString(R.string.pref_keywords_key);
+        SharedPreferences sharedPrefs = getContext().getSharedPreferences(keywordsLabel, Context.MODE_PRIVATE);
+
+        Set<String> keywords = sharedPrefs.getStringSet(keywordsKey, null);
+        Log.v(LOG_TAG, "keywordsSet in syncadapter: " + keywords);
+        if(keywords != null) {
+            ArrayList<String> keywordsArrayList = new ArrayList<String>();
+            keywordsArrayList.addAll(keywords);
+            return keywordsArrayList;
+        } else {
+            return null;
+        }
+
+    }
 
     @Override
     public void onPerformSync(
@@ -74,79 +95,85 @@ public class TracktiveSyncAdapter extends AbstractThreadedSyncAdapter {
         HttpURLConnection urlConnection = null;
         BufferedReader buffReader = null;
 
-        //loop the keywords
-        //will contain the json response.
-        String storiesJsonStr = "";
-        String callbackFormat = "JSON_CALLBACK";
-        //TODO : this needs to pull a hard string from the DB hardcoded for the moment but needs to be keyowrds
-        String keywordsQuery = "migrants,mediterranean,deaths";
-        String getArticles = "getArticles";
-        String articles = "articles";
+        ArrayList<String> keywordsArrayList = getKeywords();
+        if(getKeywords()!=null) {
+            for (int i = 0; i < keywordsArrayList.size(); i++) {
+                //loop the keywords
+                //will contain the json response.
+                String storiesJsonStr = "";
+                String callbackFormat = "JSON_CALLBACK";
+                //TODO : this needs to pull a hard string from the DB hardcoded for the moment but needs to be keyowrds
+                String keywordsQuery = keywordsArrayList.get(i);
+                String getArticles = "getArticles";
+                String articles = "articles";
 
-        try {
-            // construct URL for the EventRegistry query
+                try {
+                    // construct URL for the EventRegistry query
 
-            final String STORIES_BASE_URL = "http://eventregistry.org/json/article?ignoreKeywords=";
-            final String KEYWORDS_PARAM = "keywords";
-            final String ACTION_PARAM = "action";
-            final String RESULT_TYPE_PARAM = "resultType";
-            final String CALLBACK_PARAM = "callback";
+                    final String STORIES_BASE_URL = "http://eventregistry.org/json/article?ignoreKeywords=";
+                    final String KEYWORDS_PARAM = "keywords";
+                    final String ACTION_PARAM = "action";
+                    final String RESULT_TYPE_PARAM = "resultType";
+                    final String CALLBACK_PARAM = "callback";
 
-            Uri builtUri = Uri.parse(STORIES_BASE_URL).buildUpon()
-                    .appendQueryParameter(KEYWORDS_PARAM, keywordsQuery)
-                    .appendQueryParameter(ACTION_PARAM, getArticles)
-                    .appendQueryParameter(RESULT_TYPE_PARAM, articles)
-                    .appendQueryParameter(CALLBACK_PARAM, callbackFormat)
-                    .build();
+                    Uri builtUri = Uri.parse(STORIES_BASE_URL).buildUpon()
+                            .appendQueryParameter(KEYWORDS_PARAM, keywordsQuery)
+                            .appendQueryParameter(ACTION_PARAM, getArticles)
+                            .appendQueryParameter(RESULT_TYPE_PARAM, articles)
+//                    .appendQueryParameter(CALLBACK_PARAM, callbackFormat)
+                            .build();
 
-            URL url = new URL(builtUri.toString());
-            Log.v(LOG_TAG, "ER url: " + url);
+                    URL url = new URL(builtUri.toString());
+                    Log.v(LOG_TAG, "ER url: " + url);
 
-            //create request to EventRegisty, then open the connection.
-            urlConnection = (HttpURLConnection) url.openConnection();
-            urlConnection.setRequestMethod("GET");
-            urlConnection.connect();
+                    //create request to EventRegisty, then open the connection.
+                    urlConnection = (HttpURLConnection) url.openConnection();
+                    urlConnection.setRequestMethod("GET");
+                    urlConnection.connect();
 
-            //read input stream into a string
-            InputStream inputStream = urlConnection.getInputStream();
-            StringBuffer buffer = new StringBuffer();
-            if (inputStream == null) {
-                return;
-            }
-            buffReader = new BufferedReader(new InputStreamReader(inputStream));
+                    //read input stream into a string
+                    InputStream inputStream = urlConnection.getInputStream();
+                    StringBuffer buffer = new StringBuffer();
+                    if (inputStream == null) {
+                        return;
+                    }
+                    buffReader = new BufferedReader(new InputStreamReader(inputStream));
 
-            String line;
-            while ((line = buffReader.readLine()) != null) {
-                buffer.append(line + "\n");
-            }
+                    String line;
+                    while ((line = buffReader.readLine()) != null) {
+                        buffer.append(line + "\n");
+                    }
 
-            if (buffer.length() == 0) {
-                //stream was empty therefore no point parsing it
-                //TODO: set the status as server down if we want feedback - might not be necessary but good to bookmark.
-                return;
-              }
-            storiesJsonStr = buffer.toString();
-            Log.v(LOG_TAG, "stories JSON: " + storiesJsonStr);
-            getStoriesDataFromJson(storiesJsonStr);
+                    if (buffer.length() == 0) {
+                        //stream was empty therefore no point parsing it
+                        //TODO: set the status as server down if we want feedback - might not be necessary but good to bookmark.
+                        return;
+                    }
+                    storiesJsonStr = buffer.toString();
+                    Log.v(LOG_TAG, "stories JSON: " + storiesJsonStr);
+                    getStoriesDataFromJson(storiesJsonStr);
 
-        } catch (IOException e) {
-            Log.e(LOG_TAG, "Error: ", e);
-            //TODO: set server status if necessary
+                } catch (IOException e) {
+                    Log.e(LOG_TAG, "Error: ", e);
+                    //TODO: set server status if necessary
 
-        } catch (JSONException e) {
-            Log.e(LOG_TAG, e.getMessage(), e);
-            e.printStackTrace();
-            //TODO: set server status if necessary
-        } finally {
-            if (urlConnection != null) {
-                urlConnection.disconnect();
-            } if (buffReader != null){
-                try{
-                    buffReader.close();
-                } catch (final IOException e){
-                    Log.e(LOG_TAG, "Error closing stream", e);
+                } catch (JSONException e) {
+                    Log.e(LOG_TAG, e.getMessage(), e);
+                    e.printStackTrace();
+                    //TODO: set server status if necessary
+                } finally {
+                    if (urlConnection != null) {
+                        urlConnection.disconnect();
+                    }
+                    if (buffReader != null) {
+                        try {
+                            buffReader.close();
+                        } catch (final IOException e) {
+                            Log.e(LOG_TAG, "Error closing stream", e);
+                        }
+
+                    }
                 }
-
             }
         }
         return;
@@ -154,13 +181,14 @@ public class TracktiveSyncAdapter extends AbstractThreadedSyncAdapter {
     private void getStoriesDataFromJson(String storiesJsonStr) throws JSONException {
 
 
-        // names of JSON objects to be extracted - TODO: check these when you have wifi.
+        // names of JSON objects to be extracted -
         final String ER_TITLE = "title";
         final String ER_BODY = "body";
         final String ER_DATE = "date";
         final String ER_URL = "url";
         final String ER_SOURCE = "source";
         final String ER_RESULTS = "results";
+        final String ER_ARTICLES = "articles";
 
 
         //TODO: Don't fully understand the fucntion of this or whether there is a corresponding code in
@@ -183,7 +211,8 @@ public class TracktiveSyncAdapter extends AbstractThreadedSyncAdapter {
                 }
             }
 
-            JSONArray storiesArray = CardStoriesJson.getJSONArray(ER_RESULTS);
+            JSONObject articlesObject = CardStoriesJson.getJSONObject(ER_ARTICLES);
+            JSONArray storiesArray = articlesObject.getJSONArray(ER_RESULTS);
             Vector<ContentValues> cvVector = new Vector<>(storiesArray.length());
             for(int i = 0; i < storiesArray.length(); i++) {
                 //title, body, url
@@ -198,6 +227,8 @@ public class TracktiveSyncAdapter extends AbstractThreadedSyncAdapter {
                 body = StoryObject.getString(ER_BODY);
                 url = StoryObject.getString(ER_URL);
                 date = StoryObject.getString(ER_DATE);
+                //TODO: pull this from sharedPrefs like above
+                String keywordsQuery = "migrants,mediterranean,deaths";
 
                 //get array object for the source, then get the source
                 JSONObject sourceObject = StoryObject.getJSONObject(ER_SOURCE);
@@ -210,6 +241,9 @@ public class TracktiveSyncAdapter extends AbstractThreadedSyncAdapter {
                 storyValues.put(CardsContract.CardEntry.COLUMN_DATE, date);
                 storyValues.put(CardsContract.CardEntry.COLUMN_URL, url);
                 storyValues.put(CardsContract.CardEntry.COLUMN_SOURCE, source);
+                storyValues.put(CardsContract.CardEntry.COLUMN_CARD_KEYWORDS, keywordsQuery);
+                storyValues.put(CardsContract.CardEntry.COLUMN_BOOKMARKED, 0);
+
 
                 // pull from the same variable we use to get the original json query in the onPerformSync above
 

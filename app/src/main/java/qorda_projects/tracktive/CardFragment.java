@@ -3,7 +3,10 @@ package qorda_projects.tracktive;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
@@ -24,6 +27,8 @@ import qorda_projects.tracktive.data.CardsContract;
 public class CardFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>{
 
     private static final String LOG_TAG = CardFragment.class.getSimpleName().toString();
+    public final String DIALOG_TAG = "new card dialog";
+
     private StoryAdapter mStoryAdapter;
     private RecyclerView mCardRecyclerView;
     private int mChoiceMode;
@@ -88,6 +93,16 @@ public class CardFragment extends Fragment implements LoaderManager.LoaderCallba
             mStoryAdapter.onRestoreInstanceState(savedInstanceState);
         }
 
+        FloatingActionButton makeCardFab = (FloatingActionButton) rootView.findViewById(R.id.make_card_fab);
+        makeCardFab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.v(LOG_TAG, "OnClick called");
+                openNewCardDialog();
+            }
+        });
+
+
         return  rootView;
     }
 
@@ -143,4 +158,11 @@ public class CardFragment extends Fragment implements LoaderManager.LoaderCallba
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {mStoryAdapter.swapCursor(null);}
+
+    public void openNewCardDialog() {
+        DialogFragment newCardDialog = new KeywordsEntryDialog();
+        FragmentManager manager = getActivity().getSupportFragmentManager();
+        newCardDialog.show(manager, DIALOG_TAG);
+
+    }
 }

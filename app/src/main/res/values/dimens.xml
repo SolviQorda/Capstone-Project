@@ -8,4 +8,12 @@
     <dimen name="toolbar_elevation">8dp</dimen>
 
     <dimen name="diary_list_title">18sp</dimen>
+    <dimen name="dialog_title_height">64dp</dimen>
+
+    <!--FAB-->
+    <dimen name="fab_margin_right_phone">16dp</dimen>
+    <dimen name="fab_margin_right_tablet">24dp</dimen>
+    <dimen name="fab_margin_bottom_phone">80dp</dimen>
+    <dimen name="fab_margin_bottom_tablet">90dp</dimen>
+
 </resources>

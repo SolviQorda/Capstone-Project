@@ -6,9 +6,12 @@
     <!-- NEW CARD DIALOG -->
     <string name="build_new_card">Build a New Card</string>
     <string name="name_the_card_prompt">Name the card</string>
-    <string name="eg_search_term">search term, e.g. refugees</string>
+    <string name="eg_search_term">add a search term, e.g. refugees</string>
+    <string name="eg_search_term_2">add another here</string>
+    <string name="eg_search_term_3">leave blank if you don\'t need 3 terms</string>
     <string name="additional_term">additional search term</string>
     <string name="make_card">Make Card</string>
+    <string name="cancel">Cancel</string>
 
     <!--Error dialog-->
 
@@ -17,5 +20,21 @@
     <string name="adUnitId">ca-app-pub-3940256099942544/6300978111</string>
 
     <string name="action_settings">Settings</string>
+
+    <!--DIARY ENTRY-->
+    <string name="diary_entry">Diary entry</string>
+    <string name="date_placeholder">30th February 2140</string>
+    <string name="diary_dialog_title_entry">Title</string>
+    <string name="diary_dialog_body_entry">What are you thinking?</string>
+    <string name="save_diary_entry">Save entry</string>
+
+    <!--SHARED PREFERENCES -->
+    <string name="pref_keywords_key" translatable="false">keywords-set</string>
+    <string name="pref_keywords_label">Keywords</string>
+    <string name="pref_keywords_default">migrants,mediterranean,justice</string>
+
+    <string name="pref_card_titles_key" translatable="false">card_titles_set</string>
+    <string name="pref_card_titles_label">Card Titles</string>
+    <string name="pref_card_title_default">Migrant justice</string>
 
 </resources>
