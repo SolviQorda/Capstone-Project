@@ -28,6 +28,7 @@ public class CardFragment extends Fragment implements LoaderManager.LoaderCallba
 
     private static final String LOG_TAG = CardFragment.class.getSimpleName().toString();
     public final String DIALOG_TAG = "new card dialog";
+    static final String CARD_URI = "URI";
 
     private StoryAdapter mStoryAdapter;
     private RecyclerView mCardRecyclerView;

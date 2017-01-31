@@ -13,6 +13,7 @@ import android.content.SyncResult;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.IntDef;
 import android.util.Log;
 
@@ -69,7 +70,7 @@ public class TracktiveSyncAdapter extends AbstractThreadedSyncAdapter {
     public ArrayList<String> getKeywords(){
         String keywordsLabel = getContext().getResources().getString(R.string.pref_keywords_label);
         String keywordsKey = getContext().getResources().getString(R.string.pref_keywords_key);
-        SharedPreferences sharedPrefs = getContext().getSharedPreferences(keywordsLabel, Context.MODE_PRIVATE);
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getContext());
 
         Set<String> keywords = sharedPrefs.getStringSet(keywordsKey, null);
         Log.v(LOG_TAG, "keywordsSet in syncadapter: " + keywords);
@@ -151,7 +152,7 @@ public class TracktiveSyncAdapter extends AbstractThreadedSyncAdapter {
                     }
                     storiesJsonStr = buffer.toString();
                     Log.v(LOG_TAG, "stories JSON: " + storiesJsonStr);
-                    getStoriesDataFromJson(storiesJsonStr);
+                    getStoriesDataFromJson(storiesJsonStr, keywordsQuery);
 
                 } catch (IOException e) {
                     Log.e(LOG_TAG, "Error: ", e);
@@ -178,7 +179,7 @@ public class TracktiveSyncAdapter extends AbstractThreadedSyncAdapter {
         }
         return;
     }
-    private void getStoriesDataFromJson(String storiesJsonStr) throws JSONException {
+    private void getStoriesDataFromJson(String storiesJsonStr, String queryKeywords) throws JSONException {
 
 
         // names of JSON objects to be extracted -
@@ -228,7 +229,7 @@ public class TracktiveSyncAdapter extends AbstractThreadedSyncAdapter {
                 url = StoryObject.getString(ER_URL);
                 date = StoryObject.getString(ER_DATE);
                 //TODO: pull this from sharedPrefs like above
-                String keywordsQuery = "migrants,mediterranean,deaths";
+                String keywordsQuery = queryKeywords;
 
                 //get array object for the source, then get the source
                 JSONObject sourceObject = StoryObject.getJSONObject(ER_SOURCE);
@@ -243,11 +244,7 @@ public class TracktiveSyncAdapter extends AbstractThreadedSyncAdapter {
                 storyValues.put(CardsContract.CardEntry.COLUMN_SOURCE, source);
                 storyValues.put(CardsContract.CardEntry.COLUMN_CARD_KEYWORDS, keywordsQuery);
                 storyValues.put(CardsContract.CardEntry.COLUMN_BOOKMARKED, 0);
-
-
                 // pull from the same variable we use to get the original json query in the onPerformSync above
-
-//                storyValues.put(CardsContract.CardEntry.COLUMN_CARD_KEYWORDS, keywordsQuery);
                 cvVector.add(storyValues);
 
             }
@@ -328,6 +325,7 @@ public class TracktiveSyncAdapter extends AbstractThreadedSyncAdapter {
             }
             onAccountCreated(newAccount, context);
         }
+        //
         return newAccount;
     }
 

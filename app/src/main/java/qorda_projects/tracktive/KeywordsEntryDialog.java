@@ -3,7 +3,6 @@ package qorda_projects.tracktive;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -17,6 +16,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import qorda_projects.tracktive.sync.TracktiveSyncAdapter;
+
+import static android.preference.PreferenceManager.getDefaultSharedPreferences;
 
 /**
  * Created by sorengoard on 24/01/2017.
@@ -82,18 +83,21 @@ public class KeywordsEntryDialog extends DialogFragment {
 
                         //get cardTitle string
                         String cardTitle = mCardTitle.getText().toString();
-                        SharedPreferences titleSettings = getActivity().getSharedPreferences((getString(R.string.pref_card_titles_label)), Context.MODE_PRIVATE);
-                        SharedPreferences.Editor titleSharedPrefEditor = titleSettings.edit();
-                        Set<String> titlesSet = titleSettings.getStringSet(getString(R.string.pref_card_titles_key), null);
+                        SharedPreferences settings = getDefaultSharedPreferences(getContext());
+                        SharedPreferences.Editor settingsEditor = settings.edit();
+                        Set<String> titlesSet = settings.getStringSet(getString(R.string.pref_card_titles_key), null);
                         if(titlesSet == null) {
                             titlesSet = new HashSet<String>();
                         }
+                        Log.v(LOG_TAG, "card titles before editing" + titlesSet);
+
                         titlesSet.add(cardTitle);
-                        titleSharedPrefEditor.commit();
+                        settingsEditor.putStringSet(getString(R.string.pref_card_titles_key), titlesSet);
+                        Log.v(LOG_TAG, "card titles after editing" + titlesSet);
+
+                        settingsEditor.commit();
 
                         //get keywords here.
-                        SharedPreferences settings = getActivity().getSharedPreferences((getString(R.string.pref_keywords_label)), Context.MODE_PRIVATE);
-                        SharedPreferences.Editor sharedPrefsEditor = settings.edit();
                         ArrayList<String> keywordsList = new ArrayList<String>();
 
                         //TODO: think about handling edge cases here.
@@ -111,7 +115,7 @@ public class KeywordsEntryDialog extends DialogFragment {
                         }
                         keywordsSet.add(keywordsFromUser);
 
-                        sharedPrefsEditor.putStringSet(getString(R.string.pref_keywords_key), keywordsSet).commit();
+                        settingsEditor.putStringSet(getString(R.string.pref_keywords_key), keywordsSet).commit();
                         Log.v(LOG_TAG, "keywords after editing" + keywordsSet);
 
                         //now you have new keywords you need to make an api call

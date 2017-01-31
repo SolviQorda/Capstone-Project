@@ -18,6 +18,7 @@ public class ContentProvider extends android.content.ContentProvider {
     private CardDbHelper mCardDbHelper;
 
     static final int CARDS = 100;
+    static final int ONE_CARD = 101;
     static final int DIARY = 200;
 
     private static final SQLiteQueryBuilder sCardsByKeywordsQueryBuilder;
@@ -40,26 +41,28 @@ public class ContentProvider extends android.content.ContentProvider {
 
 
 
-//    private Cursor getCardStoriesByKeywordsSetting(Uri uri, String[] projection, String sortOrder) {
-//        String cardsSetting = CardsContract.CardEntry.getKeywordsFromUri(uri);
-//
-//        String[] selectionArgs;
-//        String selection = sKeywordsForCardSetting;
-//
-//        //TODO: this is coming from a an array list (or a string?) so we need to make sure it ends up as an array
-//
-//        selectionArgs = new String[]{cardsSetting};
-//
-//        return sCardsByKeywordsQueryBuilder.query(mCardDbHelper.getReadableDatabase(),
-//                projection,
-//                selection,
-//                selectionArgs,
-//                null,
-//                null,
-//                sortOrder);
-//
-//
-//    }
+    private Cursor getCardStoriesByKeywordsSetting(Uri uri, String[] projection, String sortOrder) {
+        // Get keywords from card title corresponding to current card.
+        String cardsSetting = CardsContract.CardEntry.getKeywordsFromUri(uri);
+
+        String[] selectionArgs;
+
+        String selection = sKeywordsForCardSetting;
+
+        //TODO: this is coming from a an array list (or a string?) so we need to make sure it ends up as an array
+
+        selectionArgs = new String[]{cardsSetting};
+
+        return sCardsByKeywordsQueryBuilder.query(mCardDbHelper.getReadableDatabase(),
+                projection,
+                selection,
+                selectionArgs,
+                null,
+                null,
+                sortOrder);
+
+
+    }
 
     static UriMatcher buildUriMatcher() {
         final UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);

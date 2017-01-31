@@ -40,9 +40,10 @@ public class CardsContract {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
 
-//        public static String g®etKeywordsFromUri(Uri uri) {
-//            return uri.getPathSegments().get(//TODO: find path segments that correspond to keywords  );
-//        }
+        public static String getKeywordsFromUri(Uri uri) {
+            //TODO: find path segments that correspond to keywords  - what does 1 do?
+            return uri.getPathSegments().get(1);
+        }
     }
 
     public static final class DiaryEntry implements BaseColumns {
@@ -62,6 +63,11 @@ public class CardsContract {
 
         public static Uri buildDiaryUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
+        }
+
+        //either string keywords, or do the call to the Utility method based on passing an int to this method. remember needs context.
+        public static Uri buildSingleCardUri(String keywords) {
+            return CONTENT_URI.buildUpon().appendPath(keywords).build();
         }
 //
 //        public static String getDiaryKeywordsFromUri(Uri uri) {

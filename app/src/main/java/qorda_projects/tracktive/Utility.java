@@ -1,6 +1,11 @@
 package qorda_projects.tracktive;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
+
 import java.util.ArrayList;
+import java.util.Set;
 
 /**
  * Created by sorengoard on 12/01/2017.
@@ -36,6 +41,16 @@ public class Utility {
         } else {
             return R.drawable.ic_bookmark_black_48dp;
         }
+
+    }
+
+    public static String getKeywordsFromElementNumber(int elementNumber, Context context) {
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
+        Set<String> keywordsSet = sharedPrefs.getStringSet(context.getString(R.string.pref_keywords_key), null);
+        ArrayList<String> keywordsArray = new ArrayList<String>();
+        keywordsArray.addAll(keywordsSet);
+        String keywordsNeeded = keywordsArray.get(elementNumber);
+        return keywordsNeeded;
 
     }
 }
