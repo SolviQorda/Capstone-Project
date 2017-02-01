@@ -18,6 +18,7 @@ public class CardsContract {
     //possible paths
     public static final String PATH_CARDS = "cards";
     public static final String PATH_DIARY = "diary";
+    public static final String PATH_SINGLE_CARD = "single_card";
 
     public static final class CardEntry implements BaseColumns {
 
@@ -38,6 +39,11 @@ public class CardsContract {
 
         public static Uri buildCardsUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
+        }
+
+        //either string keywords, or do the call to the Utility method based on passing an int to this method. remember needs context.
+        public static Uri buildSingleCardUri(String keywords) {
+            return CONTENT_URI.buildUpon().appendPath(keywords).build();
         }
 
         public static String getKeywordsFromUri(Uri uri) {
@@ -65,10 +71,6 @@ public class CardsContract {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
 
-        //either string keywords, or do the call to the Utility method based on passing an int to this method. remember needs context.
-        public static Uri buildSingleCardUri(String keywords) {
-            return CONTENT_URI.buildUpon().appendPath(keywords).build();
-        }
 //
 //        public static String getDiaryKeywordsFromUri(Uri uri) {
 //            //return uri.getPathSegments().get(//TODO: find path segments that correspond to keywords  );

@@ -15,8 +15,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
-import qorda_projects.tracktive.sync.TracktiveSyncAdapter;
-
 import static android.preference.PreferenceManager.getDefaultSharedPreferences;
 
 /**
@@ -119,7 +117,7 @@ public class KeywordsEntryDialog extends DialogFragment {
                         Log.v(LOG_TAG, "keywords after editing" + keywordsSet);
 
                         //now you have new keywords you need to make an api call
-                        TracktiveSyncAdapter.initializeSyncAdapter(getContext());
+//                        TracktiveSyncAdapter.initializeSyncAdapter(getContext());
 
                     }
                 })

@@ -18,7 +18,7 @@ public class ContentProvider extends android.content.ContentProvider {
     private CardDbHelper mCardDbHelper;
 
     static final int CARDS = 100;
-    static final int ONE_CARD = 101;
+    static final int SINGLE_CARD = 101;
     static final int DIARY = 200;
 
     private static final SQLiteQueryBuilder sCardsByKeywordsQueryBuilder;
@@ -69,7 +69,9 @@ public class ContentProvider extends android.content.ContentProvider {
         final String authority = CardsContract.CONTENT_AUTHORITY;
 
         matcher.addURI(authority, CardsContract.PATH_CARDS, CARDS);
-
+        //matcher for a single card based on keywords
+        matcher.addURI(authority, CardsContract.PATH_SINGLE_CARD, SINGLE_CARD);
+        // matcher for a diary based on keywords
         matcher.addURI(authority, CardsContract.PATH_DIARY, DIARY);
 
         //TODO: add other cases, eg diary
@@ -91,6 +93,8 @@ public class ContentProvider extends android.content.ContentProvider {
         switch (match) {
             //TODO: fill in other cases CARDS BY KEYWORD
             case CARDS:
+                return CardsContract.CardEntry.CONTENT_TYPE;
+            case SINGLE_CARD:
                 return CardsContract.CardEntry.CONTENT_TYPE;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
@@ -127,6 +131,11 @@ public class ContentProvider extends android.content.ContentProvider {
                         null,
                         sortOrder
                 );
+                break;
+            }
+            case SINGLE_CARD:
+            {
+                retCursor = getCardStoriesByKeywordsSetting(uri, projection, sortOrder);
                 break;
             }
             default:

@@ -11,6 +11,7 @@ import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -53,12 +54,9 @@ public class MainActivity extends AppCompatActivity implements KeywordsEntryDial
         SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
 
         final ViewPager viewPager = (ViewPager) findViewById(R.id.main_pager);
-        final PagerAdapter adapter = new CardPagerAdapter(
-                getSupportFragmentManager(), tabLayout.getTabCount());
-        viewPager.setAdapter(adapter);
+
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
         tabLayout.setTabMode(TabLayout.MODE_SCROLLABLE);
-
 
         Set<String> titleSet = sharedPrefs.getStringSet(getResources().getString(R.string.pref_card_titles_key), null);
 
@@ -73,6 +71,8 @@ public class MainActivity extends AppCompatActivity implements KeywordsEntryDial
             FragmentManager manager = this.getSupportFragmentManager();
             newCardDialog.show(manager, DIALOG_TAG);
         }
+
+
 
         //Hacked solution --. will need to refactor
         if (titleSet != null){
@@ -91,13 +91,21 @@ public class MainActivity extends AppCompatActivity implements KeywordsEntryDial
                 tabLayout.setContentDescription(tabTitle);
                 Bundle titlePosition = new Bundle();
                 titlePosition.putInt("cardPosition", i);
+                Log.v(LOG_TAG, "bundle: " + titlePosition);
+//                cardFragment.onCreateLoader(0, titlePosition);
             }
 
-            tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+        final PagerAdapter adapter = new CardPagerAdapter(
+                getSupportFragmentManager(), tabLayout.getTabCount());
+        viewPager.setAdapter(adapter);
+
+
+        tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
 
                 @Override
                 public void onTabSelected(TabLayout.Tab tab) {
                     viewPager.setCurrentItem(tab.getPosition());
+
                 }
 
                 @Override
@@ -114,6 +122,9 @@ public class MainActivity extends AppCompatActivity implements KeywordsEntryDial
 
             TracktiveSyncAdapter.initializeSyncAdapter(this);
 
+        if(titleSet != null){
+            TracktiveSyncAdapter.syncImmediately(this);
+        }
 
     }
 
@@ -137,4 +148,28 @@ public class MainActivity extends AppCompatActivity implements KeywordsEntryDial
 
         return super.onOptionsItemSelected(item);
     }
+
+//    class ViewPagerAdapter extends FragmentPagerAdapter {
+//
+//        private final ArrayList<Fragment> fragmentArrayList = new ArrayList<Fragment>();
+//        private final ArrayList<String> fragmentCardTitles = new ArrayList<String>();
+//
+//
+//        public ViewPagerAdapter(FragmentManager fragmentManager) {
+//            super(fragmentManager);
+//
+//            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences();
+//
+//
+//        }
+//
+//        @Override
+//        public Fragment getItem(int position) {
+//
+//        }
+//
+//
+//
+//
+//    }
 }

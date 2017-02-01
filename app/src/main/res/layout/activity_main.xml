@@ -55,11 +55,15 @@
 
         <fragment
             android:id="@+id/stories_fragment"
+            tools:context="qorda_projects.tracktive.CardFragment"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:name="qorda_projects.tracktive.CardFragment"/>
+            android:name="qorda_projects.tracktive.CardFragment"
+            tools:layout="@layout/fragment_main"/>
 
-        </android.support.v4.view.ViewPager>
+
+    </android.support.v4.view.ViewPager>
+
 
 
 </RelativeLayout>

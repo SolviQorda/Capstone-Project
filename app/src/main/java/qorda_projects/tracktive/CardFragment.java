@@ -29,6 +29,7 @@ public class CardFragment extends Fragment implements LoaderManager.LoaderCallba
     private static final String LOG_TAG = CardFragment.class.getSimpleName().toString();
     public final String DIALOG_TAG = "new card dialog";
     static final String CARD_URI = "URI";
+    private Uri mUri;
 
     private StoryAdapter mStoryAdapter;
     private RecyclerView mCardRecyclerView;
@@ -68,11 +69,25 @@ public class CardFragment extends Fragment implements LoaderManager.LoaderCallba
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
+        if(savedInstanceState != null) {
+            int cardPosition = savedInstanceState.getInt("cardPosition");
+            Log.v(LOG_TAG, "card position from bundle: " + cardPosition);
+            String keywords = Utility.getKeywordsFromElementNumber(cardPosition, getContext());
+            mUri = CardsContract.CardEntry.buildSingleCardUri(keywords);
+        } else {
+            mUri = CardsContract.CardEntry.CONTENT_URI;
+        }
+
+
+
+
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
         RecyclerView mCardRecyclerView = (RecyclerView) rootView.findViewById(R.id.recyclerview_cards);
         LinearLayoutManager llm = new LinearLayoutManager(getActivity());
         mCardRecyclerView.setLayoutManager(llm);
+
+        //Testing to see if bundle is passed from MainActivity
 
         //empty view
         View emptyView = rootView.findViewById(R.id.recyclerview_stories_empty);
@@ -123,11 +138,21 @@ public class CardFragment extends Fragment implements LoaderManager.LoaderCallba
     @Override
     public Loader<Cursor> onCreateLoader(int it, Bundle bundle) {
         String sortOrder = CardsContract.CardEntry.COLUMN_DATE+ " ASC";
-        Uri cardsForKeywordUri = CardsContract.CardEntry.CONTENT_URI;
-        Log.v(LOG_TAG, "cards Uri:" + cardsForKeywordUri);
+//        Uri cardsForKeywordUri;
+//        if(bundle != null) {
+//            int cardPosition = bundle.getInt("cardPosition");
+//            Log.v(LOG_TAG, "bundle int value in onCreateLoader" + cardPosition);
+//            String keywords = Utility.getKeywordsFromElementNumber(cardPosition, getContext());
+//            Log.v(LOG_TAG, "string taken from keywods in OCL: " + keywords);
+//
+//             cardsForKeywordUri = CardsContract.CardEntry.buildSingleCardUri(keywords);
+//            Log.v(LOG_TAG, "cards Uri:" + cardsForKeywordUri);
+//        } else {
+//            cardsForKeywordUri = CardsContract.CardEntry.CONTENT_URI;
+//        }
 
         return new CursorLoader(getActivity(),
-            cardsForKeywordUri,
+            mUri,
             STORY_COLUMNS,
             null,
             null,
