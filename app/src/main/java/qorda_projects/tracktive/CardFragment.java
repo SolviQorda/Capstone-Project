@@ -79,8 +79,6 @@ public class CardFragment extends Fragment implements LoaderManager.LoaderCallba
         }
 
 
-
-
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
         RecyclerView mCardRecyclerView = (RecyclerView) rootView.findViewById(R.id.recyclerview_cards);
@@ -138,18 +136,6 @@ public class CardFragment extends Fragment implements LoaderManager.LoaderCallba
     @Override
     public Loader<Cursor> onCreateLoader(int it, Bundle bundle) {
         String sortOrder = CardsContract.CardEntry.COLUMN_DATE+ " ASC";
-//        Uri cardsForKeywordUri;
-//        if(bundle != null) {
-//            int cardPosition = bundle.getInt("cardPosition");
-//            Log.v(LOG_TAG, "bundle int value in onCreateLoader" + cardPosition);
-//            String keywords = Utility.getKeywordsFromElementNumber(cardPosition, getContext());
-//            Log.v(LOG_TAG, "string taken from keywods in OCL: " + keywords);
-//
-//             cardsForKeywordUri = CardsContract.CardEntry.buildSingleCardUri(keywords);
-//            Log.v(LOG_TAG, "cards Uri:" + cardsForKeywordUri);
-//        } else {
-//            cardsForKeywordUri = CardsContract.CardEntry.CONTENT_URI;
-//        }
 
         return new CursorLoader(getActivity(),
             mUri,

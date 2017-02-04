@@ -25,6 +25,11 @@ public class MainActivity extends AppCompatActivity implements KeywordsEntryDial
 
     public final String DIALOG_TAG = "new card dialog";
     private final String LOG_TAG = MainActivity.class.getSimpleName().toString();
+    private ViewPager mViewPager;
+    private PagerAdapter mPagerAdapter;
+    private TabLayout mTabLayout;
+    private SharedPreferences mSharedPreferences;
+    private ArrayList<String> mTitleArrayList;
 
 
     @Override
@@ -49,24 +54,22 @@ public class MainActivity extends AppCompatActivity implements KeywordsEntryDial
         CardFragment cardFragment = ((CardFragment)getSupportFragmentManager()
         .findFragmentById(R.id.stories_fragment));
 
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.main_tabs);
+        mTabLayout = (TabLayout) findViewById(R.id.main_tabs);
 //          TODO: implement a set for titles and in the onClick
-        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
-        final ViewPager viewPager = (ViewPager) findViewById(R.id.main_pager);
+        mViewPager = (ViewPager) findViewById(R.id.main_pager);
 
-        viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
-        tabLayout.setTabMode(TabLayout.MODE_SCROLLABLE);
+        mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(mTabLayout));
+        mTabLayout.setTabMode(TabLayout.MODE_SCROLLABLE);
 
-        Set<String> titleSet = sharedPrefs.getStringSet(getResources().getString(R.string.pref_card_titles_key), null);
+        Set<String> titleSet = mSharedPreferences.getStringSet(getResources().getString(R.string.pref_card_titles_key), null);
 
         //Cast Set to arrayList to iterate
-        ArrayList<String> titleArrayList = new ArrayList<String>();
+        mTitleArrayList = new ArrayList<String>();
 
         if(titleSet == null) {
             //If no pre-existing data then need to open up the dialog.
-            //TODO: what comes after this? Really we need to call onCreate again?
-            // TODO: Maybe need to open dialog before calling the adapter.
             DialogFragment newCardDialog = new KeywordsEntryDialog();
             FragmentManager manager = this.getSupportFragmentManager();
             newCardDialog.show(manager, DIALOG_TAG);
@@ -76,35 +79,35 @@ public class MainActivity extends AppCompatActivity implements KeywordsEntryDial
 
         //Hacked solution --. will need to refactor
         if (titleSet != null){
-            titleArrayList.addAll(titleSet);
+            mTitleArrayList.addAll(titleSet);
         } else {
-            titleArrayList.add("");
+            mTitleArrayList.add("");
         }
 
 
-            //TODO: find a way to cycle through card titles.
+            //cycle through card titles.
 
-            for (int i = 0; i < titleArrayList.size(); i++) {
-                String tabTitle = titleArrayList.get(i).toString();
-                tabLayout.addTab(tabLayout.newTab().setText(tabTitle));
-                tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
-                tabLayout.setContentDescription(tabTitle);
+            for (int i = 0; i < mTitleArrayList.size(); i++) {
+                String tabTitle = mTitleArrayList.get(i).toString();
+                mTabLayout.addTab(mTabLayout.newTab().setText(tabTitle));
+                mTabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
+                mTabLayout.setContentDescription(tabTitle);
                 Bundle titlePosition = new Bundle();
                 titlePosition.putInt("cardPosition", i);
                 Log.v(LOG_TAG, "bundle: " + titlePosition);
 //                cardFragment.onCreateLoader(0, titlePosition);
             }
 
-        final PagerAdapter adapter = new CardPagerAdapter(
-                getSupportFragmentManager(), tabLayout.getTabCount());
-        viewPager.setAdapter(adapter);
+        mPagerAdapter = new CardPagerAdapter(
+                getSupportFragmentManager(), mTabLayout.getTabCount());
+        mViewPager.setAdapter(mPagerAdapter);
 
 
-        tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+        mTabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
 
                 @Override
                 public void onTabSelected(TabLayout.Tab tab) {
-                    viewPager.setCurrentItem(tab.getPosition());
+                    mViewPager.setCurrentItem(tab.getPosition());
 
                 }
 
@@ -129,7 +132,31 @@ public class MainActivity extends AppCompatActivity implements KeywordsEntryDial
     }
 
 
-    public void addCard() {
+    public void addCard(Uri cardUri) {
+
+        Bundle args = new Bundle();
+        args.putParcelable("URI", cardUri);
+        Log.v(LOG_TAG, "Card uri when added:" + cardUri);
+
+        CardFragment cardFragment = new CardFragment();
+
+        mTabLayout = (TabLayout) findViewById(R.id.main_tabs);
+        mViewPager = (ViewPager) findViewById(R.id.main_pager);
+
+        mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(mTabLayout));
+        mTabLayout.setTabMode(TabLayout.MODE_SCROLLABLE);
+
+        int cardPosition = mTabLayout.getSelectedTabPosition() + 1;
+        mTitleArrayList.addAll(mSharedPreferences.getStringSet(getResources().getString(R.string.pref_card_titles_key), null));
+        String tabTitle = mTitleArrayList.get(cardPosition);
+
+        mTabLayout.addTab(mTabLayout.newTab().setText(tabTitle));
+        mTabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
+
+        getSupportFragmentManager().beginTransaction()
+                .add(R.id.stories_fragment, cardFragment).commit();
+
+
         Toast.makeText(this, "Card made successfully!", Toast.LENGTH_LONG).show();
     }
 

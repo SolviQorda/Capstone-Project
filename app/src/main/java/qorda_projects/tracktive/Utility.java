@@ -49,7 +49,7 @@ public class Utility {
         Set<String> keywordsSet = sharedPrefs.getStringSet(context.getString(R.string.pref_keywords_key), null);
         ArrayList<String> keywordsArray = new ArrayList<String>();
         keywordsArray.addAll(keywordsSet);
-        String keywordsNeeded = keywordsArray.get(elementNumber);
+        String keywordsNeeded = keywordsArray.get(elementNumber - 1);
         return keywordsNeeded;
 
     }

@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.util.Log;
@@ -14,6 +15,9 @@ import android.widget.EditText;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
+
+import qorda_projects.tracktive.data.CardsContract;
+import qorda_projects.tracktive.sync.TracktiveSyncAdapter;
 
 import static android.preference.PreferenceManager.getDefaultSharedPreferences;
 
@@ -29,7 +33,7 @@ public class KeywordsEntryDialog extends DialogFragment {
 
     public interface keywordsDialogListener {
 
-        public void addCard();
+        public void addCard(Uri cardUri);
 
     }
 
@@ -117,7 +121,18 @@ public class KeywordsEntryDialog extends DialogFragment {
                         Log.v(LOG_TAG, "keywords after editing" + keywordsSet);
 
                         //now you have new keywords you need to make an api call
-//                        TracktiveSyncAdapter.initializeSyncAdapter(getContext());
+                        TracktiveSyncAdapter.syncImmediately(getContext());
+
+
+                        int cardPosition = keywordsSet.size();
+                        Log.v(LOG_TAG, "new card dialog count" + cardPosition);
+                        String keywords = Utility.getKeywordsFromElementNumber(cardPosition, getContext());
+                        Log.v(LOG_TAG, "string taken from keywods in dialog: " + keywords);
+
+                        Uri cardForKeywordUri = CardsContract.CardEntry.buildSingleCardUri(keywords);
+                        Log.v(LOG_TAG, "cards Uri:" + cardForKeywordUri);
+
+                        mListener.addCard(cardForKeywordUri);
 
                     }
                 })
