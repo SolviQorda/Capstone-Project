@@ -72,8 +72,6 @@ public class KeywordsEntryDialog extends DialogFragment {
                 .setPositiveButton(R.string.make_card, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        //`TODO: change sharedPrefs, make sure there is a listener for any sharedPreferenceChange to syncImmediately.
-                        //TODO: handle this through use of a separate function
 
                         Dialog dialogBox = (Dialog) dialogInterface;
                         mCardTitle = (EditText) dialogBox.findViewById(R.id.dialog_name_card);
@@ -81,7 +79,6 @@ public class KeywordsEntryDialog extends DialogFragment {
                         mKeywordTwo = (EditText) dialogBox.findViewById(R.id.dialog_keyword_2);
                         mKeywordThree = (EditText) dialogBox.findViewById(R.id.dialog_keyword_3);
 
-                        // getContext doesn't parse so getActivity()
 
                         //get cardTitle string
                         String cardTitle = mCardTitle.getText().toString();
@@ -124,7 +121,7 @@ public class KeywordsEntryDialog extends DialogFragment {
                         TracktiveSyncAdapter.syncImmediately(getContext());
 
 
-                        int cardPosition = keywordsSet.size();
+                        int cardPosition = keywordsSet.size() - 1;
                         Log.v(LOG_TAG, "new card dialog count" + cardPosition);
                         String keywords = Utility.getKeywordsFromElementNumber(cardPosition, getContext());
                         Log.v(LOG_TAG, "string taken from keywods in dialog: " + keywords);

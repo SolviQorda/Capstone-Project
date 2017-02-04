@@ -147,11 +147,14 @@ public class MainActivity extends AppCompatActivity implements KeywordsEntryDial
         mTabLayout.setTabMode(TabLayout.MODE_SCROLLABLE);
 
         int cardPosition = mTabLayout.getSelectedTabPosition() + 1;
+        args.putInt("position", cardPosition);
         mTitleArrayList.addAll(mSharedPreferences.getStringSet(getResources().getString(R.string.pref_card_titles_key), null));
         String tabTitle = mTitleArrayList.get(cardPosition);
 
         mTabLayout.addTab(mTabLayout.newTab().setText(tabTitle));
         mTabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
+
+        cardFragment.setArguments(args);
 
         getSupportFragmentManager().beginTransaction()
                 .add(R.id.stories_fragment, cardFragment).commit();
