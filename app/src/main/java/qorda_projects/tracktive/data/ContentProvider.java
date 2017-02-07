@@ -7,6 +7,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
+import android.util.Log;
 
 /**
  * Created by sorengoard on 07/01/2017.
@@ -16,6 +17,7 @@ public class ContentProvider extends android.content.ContentProvider {
 
     private static final UriMatcher sUriMatcher = buildUriMatcher();
     private CardDbHelper mCardDbHelper;
+    private static final String LOG_TAG = ContentProvider.class.getSimpleName().toString();
 
     static final int CARDS = 100;
     static final int SINGLE_CARD = 101;
@@ -44,6 +46,7 @@ public class ContentProvider extends android.content.ContentProvider {
     private Cursor getCardStoriesByKeywordsSetting(Uri uri, String[] projection, String sortOrder) {
         // Get keywords from card title corresponding to current card.
         String cardsSetting = CardsContract.CardEntry.getKeywordsFromUri(uri);
+        Log.v(LOG_TAG, "keywords from cardsetting CP: " + cardsSetting);
 
         String[] selectionArgs;
 
@@ -70,7 +73,7 @@ public class ContentProvider extends android.content.ContentProvider {
 
         matcher.addURI(authority, CardsContract.PATH_CARDS, CARDS);
         //matcher for a single card based on keywords
-        matcher.addURI(authority, CardsContract.PATH_SINGLE_CARD, SINGLE_CARD);
+        matcher.addURI(authority, CardsContract.PATH_CARDS + "/*" , SINGLE_CARD);
         // matcher for a diary based on keywords
         matcher.addURI(authority, CardsContract.PATH_DIARY, DIARY);
 

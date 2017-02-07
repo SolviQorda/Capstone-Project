@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
              xmlns:ads="http:schemas.android.com/apk/res-auto"
-             xmlns:app="http://schemas.android.com/apk/res/android"
+             xmlns:app="http://schemas.android.com/apk/res-auto"
              android:layout_width="match_parent"
              android:layout_height="match_parent"
              >
@@ -32,16 +32,20 @@
         android:text="@string/empty_story_list"
     />
 
-    <android.support.design.widget.FloatingActionButton
+    <io.github.yavski.fabspeeddial.FabSpeedDial
         android:id="@+id/make_card_fab"
         android:src="@drawable/ic_plus_white_48dp"
         android:layout_width="wrap_content"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
+        app:fabMenu="@menu/fab_menu"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
         android:elevation="@dimen/toolbar_elevation"
-        android:contentDescription="@string/make_card"
+        android:contentDescription="@string/options_fab"
         android:layout_gravity="bottom|right"
-        android:layout_marginBottom="@dimen/fab_margin_bottom_phone"
+        app:fabGravity="bottom_end"
         android:layout_marginRight="@dimen/fab_margin_right_phone"
+        android:layout_marginBottom="@dimen/fab_margin_bottom_phone"
 
     />
 
@@ -54,4 +58,4 @@
         ads:adSize="BANNER"
         ads:adUnitId="@string/adUnitId"
     />
-</FrameLayout>
+</RelativeLayout>

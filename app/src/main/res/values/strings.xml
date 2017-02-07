@@ -2,6 +2,8 @@
     <string name="app_name">Tracktive</string>
     <string name="content_authority">qorda_projects.tracktive.app</string>
     <string name="sync_account_type">tracktive.qorda_projects.com</string>
+    <string name="diary_view">Diary View</string>
+    <string name="options_fab">New Card, new diary entry and view diaries,</string>
 
     <!-- NEW CARD DIALOG -->
     <string name="build_new_card">Build a New Card</string>
@@ -23,6 +25,7 @@
 
     <!--DIARY ENTRY-->
     <string name="diary_entry">Diary entry</string>
+    <string name="new_diary_entry">New Diary Entry</string>
     <string name="date_placeholder">30th February 2140</string>
     <string name="diary_dialog_title_entry">Title</string>
     <string name="diary_dialog_body_entry">What are you thinking?</string>

@@ -1,9 +1,9 @@
 package qorda_projects.tracktive;
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -14,10 +14,13 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 
+import io.github.yavski.fabspeeddial.FabSpeedDial;
+import io.github.yavski.fabspeeddial.SimpleMenuListenerAdapter;
 import qorda_projects.tracktive.data.CardsContract;
 
 /**
@@ -29,7 +32,7 @@ public class CardFragment extends Fragment implements LoaderManager.LoaderCallba
     private static final String LOG_TAG = CardFragment.class.getSimpleName().toString();
     public final String DIALOG_TAG = "new card dialog";
     static final String CARD_URI = "URI";
-    private Uri mUri;
+    public static Uri mUri;
 
     private StoryAdapter mStoryAdapter;
     private RecyclerView mCardRecyclerView;
@@ -48,7 +51,6 @@ public class CardFragment extends Fragment implements LoaderManager.LoaderCallba
             CardsContract.CardEntry.COLUMN_BOOKMARKED,
             CardsContract.CardEntry.COLUMN_CARD_KEYWORDS,
             CardsContract.CardEntry.COLUMN_URL
-
     };
 
     static final int COL_CARD_ID = 0;
@@ -60,20 +62,32 @@ public class CardFragment extends Fragment implements LoaderManager.LoaderCallba
     static final int COL_STORY_KEYWORDS = 6;
     static final int COL_STORY_URL = 7;
 
-//    @Override
-//    public void onInflate(Activity activity, AttributeSet attrs, Bundle savedInstanceState) {
-//        super.onInflate(activity, attrs, savedInstanceState);
-//        TypedArray a = activity.obtainStyledAttributes(attrs, R.styleable.CardFragment, 0, 0);
-//    }
-//
+
+    public static final CardFragment newInstance(String title, String keywords) {
+
+        CardFragment cardFragment = new CardFragment();
+        mUri = CardsContract.CardEntry.buildSingleCardUri(keywords);
+        Log.v(LOG_TAG, "uri @newInstance" + mUri);
+
+        Bundle args = new Bundle();
+        args.putParcelable("cardUri", mUri);
+
+        cardFragment.setArguments(args);
+        return cardFragment;
+    }
+
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         if(savedInstanceState != null) {
-            int cardPosition = savedInstanceState.getInt("cardPosition");
+
+            //commenting this out for now to see whether the use of NewInstance deprecates the need.
+            int cardPosition = savedInstanceState.getInt("cardPosition") + 1;
             Log.v(LOG_TAG, "card position from bundle: " + cardPosition);
             String keywords = Utility.getKeywordsFromElementNumber(cardPosition, getContext());
             mUri = CardsContract.CardEntry.buildSingleCardUri(keywords);
+            Log.v(LOG_TAG, "uri using card pos from bundle" + mUri);
         } else {
             mUri = CardsContract.CardEntry.CONTENT_URI;
         }
@@ -107,12 +121,35 @@ public class CardFragment extends Fragment implements LoaderManager.LoaderCallba
             mStoryAdapter.onRestoreInstanceState(savedInstanceState);
         }
 
-        FloatingActionButton makeCardFab = (FloatingActionButton) rootView.findViewById(R.id.make_card_fab);
+        FabSpeedDial makeCardFab = (FabSpeedDial) rootView.findViewById(R.id.make_card_fab);
+        makeCardFab.setMenuListener(new SimpleMenuListenerAdapter() {
+            @Override
+            public boolean onMenuItemSelected(MenuItem menuItem) {
+                int id = menuItem.getItemId();
+
+                if(id == R.id.new_card){
+                    Log.v(LOG_TAG, "add card called");
+                    openNewCardDialog();
+                    return true;
+                }
+                else if (id == R.id.diary_view) {
+                    Intent diaryIntent = new Intent(getContext(), DiaryActivity.class);
+                    getContext().startActivity(diaryIntent);
+                    return true;
+                }
+                else if (id == R.id.new_diary_entry) {
+//                    openNewDiaryEntryDialog
+                            return true;
+                }
+                return super.onMenuItemSelected(menuItem);
+            }
+
+        });
+
         makeCardFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.v(LOG_TAG, "OnClick called");
-                openNewCardDialog();
+
             }
         });
 

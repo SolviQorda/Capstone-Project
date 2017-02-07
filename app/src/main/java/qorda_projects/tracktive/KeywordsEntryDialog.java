@@ -91,7 +91,7 @@ public class KeywordsEntryDialog extends DialogFragment {
                         Log.v(LOG_TAG, "card titles before editing" + titlesSet);
 
                         titlesSet.add(cardTitle);
-                        settingsEditor.putStringSet(getString(R.string.pref_card_titles_key), titlesSet);
+                        settingsEditor.putStringSet(getString(R.string.pref_card_titles_key), titlesSet).commit();
                         Log.v(LOG_TAG, "card titles after editing" + titlesSet);
 
                         settingsEditor.commit();
@@ -120,10 +120,9 @@ public class KeywordsEntryDialog extends DialogFragment {
                         //now you have new keywords you need to make an api call
                         TracktiveSyncAdapter.syncImmediately(getContext());
 
-
-//                        int cardPosition = keywordsSet.size() - 1;
-//                        Log.v(LOG_TAG, "new card dialog count" + cardPosition);
-                        String keywords = Utility.getKeywordsFromElementNumber(0, getContext());
+                        int cardPosition = keywordsSet.size() - 1;
+                        Log.v(LOG_TAG, "new card dialog count" + cardPosition);
+                        String keywords = Utility.getKeywordsFromElementNumber(cardPosition, getContext());
                         Log.v(LOG_TAG, "string taken from keywods in dialog: " + keywords);
 
                         Uri cardForKeywordUri = CardsContract.CardEntry.buildSingleCardUri(keywords);

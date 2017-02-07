@@ -35,7 +35,6 @@ dependencies {
     compile 'com.android.support:design:25.0.1'
     compile 'com.squareup.okhttp3:okhttp:3.5.0'
     testCompile 'junit:junit:4.12'
-    compile 'com.jakewharton:butterknife:8.4.0'
-    annotationProcessor 'com.jakewharton:butterknife-compiler:8.4.0'
+    compile 'io.github.yavski:fab-speed-dial:1.0.6'
 
 }
