@@ -162,7 +162,7 @@ if (mTitleArrayList != null ) {
         String tabTitle = mTitleArrayList.get(newCardPosition);
         Log.v(LOG_TAG, "new card Position for " + tabTitle + " is " +newCardPosition);
 
-        mTabLayout.addTab(mTabLayout.newTab().setText(tabTitle), true);
+        mTabLayout.addTab(mTabLayout.newTab().setText(tabTitle), newCardPosition, true);
         mTabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
 
         List<Fragment> cardFragmentList = getCardFragments();
