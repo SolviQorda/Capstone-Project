@@ -173,7 +173,6 @@ if (mTitleArrayList != null ) {
 
         cardFragmentList.add(CardFragment.newInstance(tabTitle, cardKeywords));
 
-
         Toast.makeText(this, "Card made successfully!", Toast.LENGTH_LONG).show();
     }
 
