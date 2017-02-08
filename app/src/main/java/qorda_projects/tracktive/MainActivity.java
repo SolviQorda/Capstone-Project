@@ -28,7 +28,7 @@ public class MainActivity extends AppCompatActivity implements KeywordsEntryDial
     public final String DIALOG_TAG = "new card dialog";
     private final String LOG_TAG = MainActivity.class.getSimpleName().toString();
     private ViewPager mViewPager;
-    private PagerAdapter mPagerAdapter;
+    public PagerAdapter mPagerAdapter;
     private TabLayout mTabLayout;
     private SharedPreferences mSharedPreferences;
     private ArrayList<String> mTitleArrayList;
@@ -48,10 +48,11 @@ public class MainActivity extends AppCompatActivity implements KeywordsEntryDial
 
         getExistingTitles();
         getExistingKeywords();
-        mFragments = getCardFragments();
+        getCardFragments();
 
         if (mFragments == null) {
             //If no pre-existing data then need to open up the dialog.
+            mFragments = new ArrayList<Fragment>();
             DialogFragment newCardDialog = new KeywordsEntryDialog();
             FragmentManager manager = this.getSupportFragmentManager();
             newCardDialog.show(manager, DIALOG_TAG);
@@ -166,12 +167,14 @@ if (mTitleArrayList != null ) {
         String tabTitle = mTitleArrayList.get(0);
         Log.v(LOG_TAG, "new card Position for " + tabTitle + " is " +newCardPosition);
 
+        mPagerAdapter.notifyDataSetChanged();
         mTabLayout.addTab(mTabLayout.newTab().setText(tabTitle), newCardPosition, true);
-        mTabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
+        mPagerAdapter.notifyDataSetChanged();
 
-        List<Fragment> cardFragmentList = getCardFragments();
+        mFragments.add(CardFragment.newInstance(tabTitle, cardKeywords));
 
-        cardFragmentList.add(CardFragment.newInstance(tabTitle, cardKeywords));
+        mPagerAdapter.notifyDataSetChanged();
+
 
         Toast.makeText(this, "Card made successfully!", Toast.LENGTH_LONG).show();
     }
@@ -192,7 +195,7 @@ if (mTitleArrayList != null ) {
         return super.onOptionsItemSelected(item);
     }
 
-    private List<Fragment> getCardFragments() {
+    private void getCardFragments() {
         List<Fragment> cardFragmentList = new ArrayList<Fragment>();
 
         mKeywordArrayList = getExistingKeywords();
@@ -210,10 +213,11 @@ if (mTitleArrayList != null ) {
                 }
                 Log.v(LOG_TAG, "at position " + i + " cardTitle: " + cardTitle);
                 cardFragmentList.add(CardFragment.newInstance(cardTitle, cardKeywords));
+                mFragments = cardFragmentList;
             }
-            return cardFragmentList;
-        } else {
-            return null;
+//            return cardFragmentList;
+//        } else {
+//            return null;
         }
 
     }
