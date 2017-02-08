@@ -120,9 +120,10 @@ public class KeywordsEntryDialog extends DialogFragment {
                         //now you have new keywords you need to make an api call
                         TracktiveSyncAdapter.syncImmediately(getContext());
 
+                        //In a set add(0 doesn't append it prepends so we want 0
                         int cardPosition = keywordsSet.size() - 1;
                         Log.v(LOG_TAG, "new card dialog count" + cardPosition);
-                        String keywords = Utility.getKeywordsFromElementNumber(cardPosition, getContext());
+                        String keywords = Utility.getKeywordsFromElementNumber(0, getContext());
                         Log.v(LOG_TAG, "string taken from keywods in dialog: " + keywords);
 
                         Uri cardForKeywordUri = CardsContract.CardEntry.buildSingleCardUri(keywords);

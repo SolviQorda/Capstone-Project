@@ -33,6 +33,7 @@ public class MainActivity extends AppCompatActivity implements KeywordsEntryDial
     private SharedPreferences mSharedPreferences;
     private ArrayList<String> mTitleArrayList;
     private ArrayList<String> mKeywordArrayList;
+    public List<Fragment> mFragments;
 
 
     @Override
@@ -47,9 +48,9 @@ public class MainActivity extends AppCompatActivity implements KeywordsEntryDial
 
         getExistingTitles();
         getExistingKeywords();
-        List<Fragment> fragments = getCardFragments();
+        mFragments = getCardFragments();
 
-        if (fragments == null) {
+        if (mFragments == null) {
             //If no pre-existing data then need to open up the dialog.
             DialogFragment newCardDialog = new KeywordsEntryDialog();
             FragmentManager manager = this.getSupportFragmentManager();
@@ -80,7 +81,7 @@ public class MainActivity extends AppCompatActivity implements KeywordsEntryDial
         mTabLayout.setTabMode(TabLayout.MODE_SCROLLABLE);
 
         mPagerAdapter = new CardPagerAdapter(
-                getSupportFragmentManager(), fragments);
+                getSupportFragmentManager(), mFragments);
         mViewPager.setAdapter(mPagerAdapter);
 
 
@@ -121,7 +122,7 @@ if (mTitleArrayList != null ) {
         });
 
 
-        if (fragments != null) {
+        if (mFragments != null) {
             TracktiveSyncAdapter.initializeSyncAdapter(this);
 
             TracktiveSyncAdapter.syncImmediately(this);
@@ -148,18 +149,21 @@ if (mTitleArrayList != null ) {
         Log.v(LOG_TAG, "cardPosition" + cardPosition);
         args.putInt("position", cardPosition + 1);
 
+        getExistingKeywords();
+        getExistingTitles();
+
         if (mTitleArrayList == null) {
             mTitleArrayList = new ArrayList<String>();
         }
 
         //Hasn't add all been performed already? if so would suggest that this line of code would duplicate.
-        mTitleArrayList.addAll(mSharedPreferences.getStringSet(getResources().getString(R.string.pref_card_titles_key), null));
-        int newCardPosition = 0;
-        if (cardPosition > 0) {
-            newCardPosition = cardPosition + 1;
-        }
-        String cardKeywords = mKeywordArrayList.get(newCardPosition);
-        String tabTitle = mTitleArrayList.get(newCardPosition);
+//        mTitleArrayList.addAll(mSharedPreferences.getStringSet(getResources().getString(R.string.pref_card_titles_key), null));
+        int newCardPosition = cardPosition + 1;
+        Log.v(LOG_TAG, "titlesArray in AddCard is: " + mTitleArrayList);
+        Log.v(LOG_TAG, "keywordssArray in AddCard is: " + mKeywordArrayList);
+
+        String cardKeywords = mKeywordArrayList.get(0);
+        String tabTitle = mTitleArrayList.get(0);
         Log.v(LOG_TAG, "new card Position for " + tabTitle + " is " +newCardPosition);
 
         mTabLayout.addTab(mTabLayout.newTab().setText(tabTitle), newCardPosition, true);
