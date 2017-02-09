@@ -31,8 +31,8 @@ public class MainActivity extends AppCompatActivity implements KeywordsEntryDial
     public PagerAdapter mPagerAdapter;
     private TabLayout mTabLayout;
     private SharedPreferences mSharedPreferences;
-    private ArrayList<String> mTitleArrayList;
-    private ArrayList<String> mKeywordArrayList;
+    public ArrayList<String> mTitleArrayList;
+    public ArrayList<String> mKeywordArrayList;
     public List<Fragment> mFragments;
 
 
@@ -40,6 +40,8 @@ public class MainActivity extends AppCompatActivity implements KeywordsEntryDial
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ((MyApplication) getApplication()).startTracking();
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.main_toolbar);
         setSupportActionBar(toolbar);
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
@@ -132,13 +134,13 @@ if (mTitleArrayList != null ) {
     }
 
 
-    public void addCard(Uri cardUri) {
+
+
+    public void addCard(ArrayList<String> titlesArrayList, ArrayList<String> keywordsArrayList, Uri cardUri) {
 
         Bundle args = new Bundle();
         args.putParcelable("URI", cardUri);
         Log.v(LOG_TAG, "Card uri when added:" + cardUri);
-
-        CardFragment cardFragment = new CardFragment();
 
         mTabLayout = (TabLayout) findViewById(R.id.main_tabs);
         mViewPager = (ViewPager) findViewById(R.id.main_pager);
@@ -150,25 +152,23 @@ if (mTitleArrayList != null ) {
         Log.v(LOG_TAG, "cardPosition" + cardPosition);
         args.putInt("position", cardPosition + 1);
 
-        getExistingKeywords();
-        getExistingTitles();
+        mTitleArrayList = titlesArrayList;
+        mKeywordArrayList = keywordsArrayList;
 
-        if (mTitleArrayList == null) {
-            mTitleArrayList = new ArrayList<String>();
-        }
-
-        //Hasn't add all been performed already? if so would suggest that this line of code would duplicate.
-//        mTitleArrayList.addAll(mSharedPreferences.getStringSet(getResources().getString(R.string.pref_card_titles_key), null));
-        int newCardPosition = cardPosition + 1;
+//        if (mTitleArrayList == null) {
+//            mTitleArrayList = new ArrayList<String>();
+//        }
+//
+        int newCardPosition = mFragments.size();
         Log.v(LOG_TAG, "titlesArray in AddCard is: " + mTitleArrayList);
         Log.v(LOG_TAG, "keywordssArray in AddCard is: " + mKeywordArrayList);
 
-        String cardKeywords = mKeywordArrayList.get(0);
-        String tabTitle = mTitleArrayList.get(0);
-        Log.v(LOG_TAG, "new card Position for " + tabTitle + " is " +newCardPosition);
+        String cardKeywords = mKeywordArrayList.get(newCardPosition);
+        String tabTitle = mTitleArrayList.get(newCardPosition);
+        Log.v(LOG_TAG, "new card Position for " + tabTitle + " is " + newCardPosition);
 
         mPagerAdapter.notifyDataSetChanged();
-        mTabLayout.addTab(mTabLayout.newTab().setText(tabTitle), newCardPosition, true);
+        mTabLayout.addTab(mTabLayout.newTab().setText(tabTitle), true);
         mPagerAdapter.notifyDataSetChanged();
 
         mFragments.add(CardFragment.newInstance(tabTitle, cardKeywords));
@@ -224,28 +224,21 @@ if (mTitleArrayList != null ) {
 
     private ArrayList<String> getExistingTitles() {
         Set<String> titleSet = mSharedPreferences.getStringSet(getResources().getString(R.string.pref_card_titles_key), null);
+        mTitleArrayList = new ArrayList<String>();
         if (titleSet != null) {
-            mTitleArrayList = new ArrayList<String>();
             mTitleArrayList.addAll(titleSet);
-            return mTitleArrayList;
-        } else {
-            return null;
         }
-
+        return mTitleArrayList;
     }
 
     private ArrayList<String> getExistingKeywords() {
         Set<String> keywordSet = mSharedPreferences.getStringSet(getResources().getString(R.string.pref_keywords_key), null);
         //Cast Set to arrayList to iterate
+        mKeywordArrayList = new ArrayList<String>();
         if (keywordSet != null) {
-            mKeywordArrayList = new ArrayList<String>();
             mKeywordArrayList.addAll(keywordSet);
-            return mKeywordArrayList;
-        } else {
-            ArrayList<String> keywordArrayList = new ArrayList<String>();
-            keywordArrayList.add("");
-            return keywordArrayList;
         }
+        return mKeywordArrayList;
     }
 
 }

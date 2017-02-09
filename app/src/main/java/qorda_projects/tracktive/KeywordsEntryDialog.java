@@ -13,7 +13,7 @@ import android.view.LayoutInflater;
 import android.widget.EditText;
 
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import qorda_projects.tracktive.data.CardsContract;
@@ -33,7 +33,7 @@ public class KeywordsEntryDialog extends DialogFragment {
 
     public interface keywordsDialogListener {
 
-        public void addCard(Uri cardUri);
+        public void addCard(ArrayList<String> titlesArrayList, ArrayList<String> keywordsArrayList, Uri cardUri);
 
     }
 
@@ -82,19 +82,20 @@ public class KeywordsEntryDialog extends DialogFragment {
 
                         //get cardTitle string
                         String cardTitle = mCardTitle.getText().toString();
+
                         SharedPreferences settings = getDefaultSharedPreferences(getContext());
+
                         SharedPreferences.Editor settingsEditor = settings.edit();
-                        Set<String> titlesSet = settings.getStringSet(getString(R.string.pref_card_titles_key), null);
-                        if(titlesSet == null) {
-                            titlesSet = new HashSet<String>();
-                        }
-                        Log.v(LOG_TAG, "card titles before editing" + titlesSet);
+                        Set<String> titlesSetOut = settings.getStringSet(getString(R.string.pref_card_titles_key), new LinkedHashSet<String>());
+                        LinkedHashSet<String> titlesSetIn = new LinkedHashSet<String>(titlesSetOut);
+                        Log.v(LOG_TAG, "card titles before editing" + titlesSetOut);
 
-                        titlesSet.add(cardTitle);
-                        settingsEditor.putStringSet(getString(R.string.pref_card_titles_key), titlesSet).commit();
-                        Log.v(LOG_TAG, "card titles after editing" + titlesSet);
+                        titlesSetIn.add(cardTitle);
+                        settingsEditor.remove(getString(R.string.pref_card_titles_key));
+//                        settingsEditor.commit();
 
-                        settingsEditor.commit();
+
+//                        settingsEditor.commit();
 
                         //get keywords here.
                         ArrayList<String> keywordsList = new ArrayList<String>();
@@ -107,29 +108,37 @@ public class KeywordsEntryDialog extends DialogFragment {
 
                         String keywordsFromUser = Utility.keywordsArrayToString(keywordsList);
 
-                        Set<String> keywordsSet = settings.getStringSet(getString(R.string.pref_keywords_key), null);
-                        Log.v(LOG_TAG, "keywords before editing" + keywordsSet);
-                        if(keywordsSet == null) {
-                            keywordsSet = new HashSet<String>();
-                        }
-                        keywordsSet.add(keywordsFromUser);
+                        Set<String> keywordsSetOut = settings.getStringSet(getString(R.string.pref_keywords_key), new LinkedHashSet<String>());
+                        LinkedHashSet<String> keywordsSetIn = new LinkedHashSet<String>(keywordsSetOut);
+                        Log.v(LOG_TAG, "keywords before editing" + keywordsSetOut);
+                        keywordsSetIn.add(keywordsFromUser);
+                        settingsEditor.remove(getString(R.string.pref_keywords_key));
 
-                        settingsEditor.putStringSet(getString(R.string.pref_keywords_key), keywordsSet).commit();
-                        Log.v(LOG_TAG, "keywords after editing" + keywordsSet);
+                        settingsEditor.putStringSet(getString(R.string.pref_card_titles_key), titlesSetIn);
+                        Log.v(LOG_TAG, "card titles after editing" + titlesSetIn);
+
+                        settingsEditor.putStringSet(getString(R.string.pref_keywords_key), keywordsSetIn);
+                        settingsEditor.commit();
+
+//                        settingsEditor.apply();
+                        Log.v(LOG_TAG, "keywords after editing" + keywordsSetIn);
 
                         //now you have new keywords you need to make an api call
                         TracktiveSyncAdapter.syncImmediately(getContext());
 
-                        //In a set add(0 doesn't append it prepends so we want 0
-                        int cardPosition = keywordsSet.size() - 1;
+                        int cardPosition = keywordsSetIn.size() - 1;
                         Log.v(LOG_TAG, "new card dialog count" + cardPosition);
-                        String keywords = Utility.getKeywordsFromElementNumber(0, getContext());
-                        Log.v(LOG_TAG, "string taken from keywods in dialog: " + keywords);
+                        Log.v(LOG_TAG, "string taken from keywods in dialog: " + keywordsFromUser);
 
-                        Uri cardForKeywordUri = CardsContract.CardEntry.buildSingleCardUri(keywords);
+                        Uri cardForKeywordUri = CardsContract.CardEntry.buildSingleCardUri(keywordsFromUser);
                         Log.v(LOG_TAG, "cards Uri:" + cardForKeywordUri);
 
-                        mListener.addCard(cardForKeywordUri);
+                        ArrayList<String> titlesArrayList = new ArrayList<String>();
+                        ArrayList<String> keywordsArrayList = new ArrayList<String>();
+                        titlesArrayList.addAll(titlesSetIn);
+                        keywordsArrayList.addAll(keywordsSetIn);
+
+                        mListener.addCard(titlesArrayList, keywordsArrayList, cardForKeywordUri);
 
                     }
                 })
