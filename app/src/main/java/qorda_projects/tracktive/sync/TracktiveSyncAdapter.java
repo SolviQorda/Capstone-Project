@@ -17,6 +17,10 @@ import android.preference.PreferenceManager;
 import android.support.annotation.IntDef;
 import android.util.Log;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -30,9 +34,9 @@ import java.lang.annotation.RetentionPolicy;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Set;
 import java.util.Vector;
 
+import qorda_projects.tracktive.Card;
 import qorda_projects.tracktive.R;
 import qorda_projects.tracktive.data.CardsContract;
 
@@ -67,17 +71,17 @@ public class TracktiveSyncAdapter extends AbstractThreadedSyncAdapter {
 
     }
 
-    public ArrayList<String> getKeywords(){
-        String keywordsLabel = getContext().getResources().getString(R.string.pref_keywords_label);
-        String keywordsKey = getContext().getResources().getString(R.string.pref_keywords_key);
+    public ArrayList<Card> getKeywords(){
+        String jsonKey = getContext().getResources().getString(R.string.pref_card_titles_key);
         SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getContext());
 
-        Set<String> keywords = sharedPrefs.getStringSet(keywordsKey, null);
-        Log.v(LOG_TAG, "keywordsSet in syncadapter: " + keywords);
-        if(keywords != null) {
-            ArrayList<String> keywordsArrayList = new ArrayList<String>();
-            keywordsArrayList.addAll(keywords);
-            return keywordsArrayList;
+        String existingCardsJson = sharedPrefs.getString(jsonKey, null);
+        if(existingCardsJson != null) {
+            GsonBuilder builder = new GsonBuilder();
+            Gson gson = builder.create();
+
+            ArrayList<Card> titlesAndKeywords = (ArrayList<Card>) gson.fromJson(existingCardsJson, new TypeToken<ArrayList<Card>>(){}.getType());
+            return titlesAndKeywords;
         } else {
             return null;
         }
@@ -96,7 +100,7 @@ public class TracktiveSyncAdapter extends AbstractThreadedSyncAdapter {
         HttpURLConnection urlConnection = null;
         BufferedReader buffReader = null;
 
-        ArrayList<String> keywordsArrayList = getKeywords();
+        ArrayList<Card> keywordsArrayList = getKeywords();
         if(getKeywords()!=null) {
             for (int i = 0; i < keywordsArrayList.size(); i++) {
                 //loop the keywords
@@ -104,7 +108,8 @@ public class TracktiveSyncAdapter extends AbstractThreadedSyncAdapter {
                 String storiesJsonStr = "";
                 String callbackFormat = "JSON_CALLBACK";
                 //TODO : this needs to pull a hard string from the DB hardcoded for the moment but needs to be keyowrds
-                String keywordsQuery = keywordsArrayList.get(i);
+                Card card = keywordsArrayList.get(i);
+                String keywordsQuery = card.getKeywords();
                 String getArticles = "getArticles";
                 String articles = "articles";
 

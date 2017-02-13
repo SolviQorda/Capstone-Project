@@ -12,9 +12,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.widget.EditText;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
+
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.Set;
 
 import qorda_projects.tracktive.data.CardsContract;
 import qorda_projects.tracktive.sync.TracktiveSyncAdapter;
@@ -33,7 +35,7 @@ public class KeywordsEntryDialog extends DialogFragment {
 
     public interface keywordsDialogListener {
 
-        public void addCard(ArrayList<String> titlesArrayList, ArrayList<String> keywordsArrayList, Uri cardUri);
+        public void addCard(ArrayList<Card> titlesAndKeywordsArrayList, Uri cardUri);
 
     }
 
@@ -83,20 +85,6 @@ public class KeywordsEntryDialog extends DialogFragment {
                         //get cardTitle string
                         String cardTitle = mCardTitle.getText().toString();
 
-                        SharedPreferences settings = getDefaultSharedPreferences(getContext());
-
-                        SharedPreferences.Editor settingsEditor = settings.edit();
-                        Set<String> titlesSetOut = settings.getStringSet(getString(R.string.pref_card_titles_key), new LinkedHashSet<String>());
-                        LinkedHashSet<String> titlesSetIn = new LinkedHashSet<String>(titlesSetOut);
-                        Log.v(LOG_TAG, "card titles before editing" + titlesSetOut);
-
-                        titlesSetIn.add(cardTitle);
-                        settingsEditor.remove(getString(R.string.pref_card_titles_key));
-//                        settingsEditor.commit();
-
-
-//                        settingsEditor.commit();
-
                         //get keywords here.
                         ArrayList<String> keywordsList = new ArrayList<String>();
 
@@ -108,37 +96,50 @@ public class KeywordsEntryDialog extends DialogFragment {
 
                         String keywordsFromUser = Utility.keywordsArrayToString(keywordsList);
 
-                        Set<String> keywordsSetOut = settings.getStringSet(getString(R.string.pref_keywords_key), new LinkedHashSet<String>());
-                        LinkedHashSet<String> keywordsSetIn = new LinkedHashSet<String>(keywordsSetOut);
-                        Log.v(LOG_TAG, "keywords before editing" + keywordsSetOut);
-                        keywordsSetIn.add(keywordsFromUser);
-                        settingsEditor.remove(getString(R.string.pref_keywords_key));
+                        //create a card object
 
-                        settingsEditor.putStringSet(getString(R.string.pref_card_titles_key), titlesSetIn);
-                        Log.v(LOG_TAG, "card titles after editing" + titlesSetIn);
+                        Card newCardDetails = new Card(cardTitle, keywordsFromUser);
+                        Log.v(LOG_TAG, "data from user input" + newCardDetails);
 
-                        settingsEditor.putStringSet(getString(R.string.pref_keywords_key), keywordsSetIn);
+                        //SharedPrefs get any existing data
+
+                        SharedPreferences settings = getDefaultSharedPreferences(getContext());
+
+                        SharedPreferences.Editor settingsEditor = settings.edit();
+                        String existingTitlesAndKeywordsJson = settings.getString(getString(R.string.pref_card_titles_key), null);
+                        Log.v(LOG_TAG, "pre-existing json" + existingTitlesAndKeywordsJson);
+
+                        // GSON builder
+
+                        GsonBuilder builder = new GsonBuilder();
+                        Gson gson = builder.create();
+
+                        //Convert JSON to Cards and add new card
+
+                        ArrayList<Card> titlesAndKeywords = new ArrayList<Card>();
+                        if (existingTitlesAndKeywordsJson != null) {
+                            titlesAndKeywords = (ArrayList<Card>) gson.fromJson(existingTitlesAndKeywordsJson, new TypeToken<ArrayList<Card>>() {}.getType());
+                        }
+                        titlesAndKeywords.add(newCardDetails);
+
+
+                        //arraylist --> GSON
+
+                        String titlesAndKeywordsJson = gson.toJson(titlesAndKeywords);
+                        Log.v(LOG_TAG, "t&v json:" + titlesAndKeywordsJson);
+
+                        settingsEditor.putString(getString(R.string.pref_card_titles_key), titlesAndKeywordsJson);
+
                         settingsEditor.commit();
-
-//                        settingsEditor.apply();
-                        Log.v(LOG_TAG, "keywords after editing" + keywordsSetIn);
 
                         //now you have new keywords you need to make an api call
                         TracktiveSyncAdapter.syncImmediately(getContext());
 
-                        int cardPosition = keywordsSetIn.size() - 1;
-                        Log.v(LOG_TAG, "new card dialog count" + cardPosition);
-                        Log.v(LOG_TAG, "string taken from keywods in dialog: " + keywordsFromUser);
-
                         Uri cardForKeywordUri = CardsContract.CardEntry.buildSingleCardUri(keywordsFromUser);
                         Log.v(LOG_TAG, "cards Uri:" + cardForKeywordUri);
 
-                        ArrayList<String> titlesArrayList = new ArrayList<String>();
-                        ArrayList<String> keywordsArrayList = new ArrayList<String>();
-                        titlesArrayList.addAll(titlesSetIn);
-                        keywordsArrayList.addAll(keywordsSetIn);
 
-                        mListener.addCard(titlesArrayList, keywordsArrayList, cardForKeywordUri);
+                        mListener.addCard(titlesAndKeywords, cardForKeywordUri);
 
                     }
                 })

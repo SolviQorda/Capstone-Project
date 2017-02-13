@@ -32,11 +32,11 @@
     <string name="save_diary_entry">Save entry</string>
 
     <!--SHARED PREFERENCES -->
-    <string name="pref_keywords_key" translatable="false">keywords-set</string>
+    <string name="pref_keywords_key" translatable="false">keywords-json-string</string>
     <string name="pref_keywords_label">Keywords</string>
     <string name="pref_keywords_default">migrants,mediterranean,justice</string>
 
-    <string name="pref_card_titles_key" translatable="false">card_titles_set</string>
+    <string name="pref_card_titles_key" translatable="false">card_titles_json_string</string>
     <string name="pref_card_titles_label">Card Titles</string>
     <string name="pref_card_title_default">Migrant justice</string>
 

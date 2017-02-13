@@ -96,8 +96,10 @@ public class ContentProvider extends android.content.ContentProvider {
         switch (match) {
             //TODO: fill in other cases CARDS BY KEYWORD
             case CARDS:
+                Log.v(LOG_TAG, "multiple cards card type called in GetType");
                 return CardsContract.CardEntry.CONTENT_TYPE;
             case SINGLE_CARD:
+                Log.v(LOG_TAG, "single card type called in GetType");
                 return CardsContract.CardEntry.CONTENT_TYPE;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);

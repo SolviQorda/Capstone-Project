@@ -82,12 +82,16 @@ public class CardFragment extends Fragment implements LoaderManager.LoaderCallba
 
         if(savedInstanceState != null) {
 
-            //commenting this out for now to see whether the use of NewInstance deprecates the need.
-            int cardPosition = savedInstanceState.getInt("cardPosition") + 1;
-            Log.v(LOG_TAG, "card position from bundle: " + cardPosition);
-            String keywords = Utility.getKeywordsFromElementNumber(cardPosition, getContext());
-            mUri = CardsContract.CardEntry.buildSingleCardUri(keywords);
-            Log.v(LOG_TAG, "uri using card pos from bundle" + mUri);
+            //if you can get the uri bundle from addCard  then this position malarkey is irrelevant
+//            int cardPosition = savedInstanceState.getInt("cardPosition") + 1;
+//            Log.v(LOG_TAG, "card position from bundle: " + cardPosition);
+//            String keywords = Utility.getKeywordsFromElementNumber(cardPosition, getContext());
+//            mUri = CardsContract.CardEntry.buildSingleCardUri(keywords);
+//            Log.v(LOG_TAG, "uri using card pos from bundle" + mUri);
+            Uri cardUri = savedInstanceState.getParcelable("cardUri");
+            mUri = cardUri;
+            Log.v(LOG_TAG, "uri using uri from bundle" + mUri);
+
         } else {
             mUri = CardsContract.CardEntry.CONTENT_URI;
         }

@@ -48,6 +48,8 @@ public class Utility {
         SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
         Set<String> keywordsSet = sharedPrefs.getStringSet(context.getString(R.string.pref_keywords_key), null);
         ArrayList<String> keywordsArray = new ArrayList<String>();
+
+        // take the json and build an arrayList.
         keywordsArray.addAll(keywordsSet);
         String keywordsNeeded = keywordsArray.get(elementNumber);
         return keywordsNeeded;
