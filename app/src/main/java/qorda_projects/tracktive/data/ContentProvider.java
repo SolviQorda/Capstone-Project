@@ -126,6 +126,8 @@ public class ContentProvider extends android.content.ContentProvider {
         switch(sUriMatcher.match(uri)) {
 
             case CARDS:
+                Log.v(LOG_TAG, "multiple cards card type called in query");
+
             {
                 retCursor = mCardDbHelper.getReadableDatabase().query(
                         CardsContract.CardEntry.TABLE_NAME,
@@ -139,6 +141,8 @@ public class ContentProvider extends android.content.ContentProvider {
                 break;
             }
             case SINGLE_CARD:
+                Log.v(LOG_TAG, "single cards card type called in query");
+
             {
                 retCursor = getCardStoriesByKeywordsSetting(uri, projection, sortOrder);
                 break;

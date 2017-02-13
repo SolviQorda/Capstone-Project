@@ -31,7 +31,7 @@ public class CardFragment extends Fragment implements LoaderManager.LoaderCallba
 
     private static final String LOG_TAG = CardFragment.class.getSimpleName().toString();
     public final String DIALOG_TAG = "new card dialog";
-    static final String CARD_URI = "URI";
+    static final String CARD_URI = "cardUri";
     public static Uri mUri;
 
     private StoryAdapter mStoryAdapter;
@@ -80,22 +80,27 @@ public class CardFragment extends Fragment implements LoaderManager.LoaderCallba
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        if(savedInstanceState != null) {
+        if(mUri == null) {
+            if(savedInstanceState != null) {
+                mUri = savedInstanceState.getParcelable(CARD_URI);
+                Log.v(LOG_TAG, "uri using card pos from bundle" + mUri);
 
-            //if you can get the uri bundle from addCard  then this position malarkey is irrelevant
-//            int cardPosition = savedInstanceState.getInt("cardPosition") + 1;
-//            Log.v(LOG_TAG, "card position from bundle: " + cardPosition);
-//            String keywords = Utility.getKeywordsFromElementNumber(cardPosition, getContext());
-//            mUri = CardsContract.CardEntry.buildSingleCardUri(keywords);
-//            Log.v(LOG_TAG, "uri using card pos from bundle" + mUri);
-            Uri cardUri = savedInstanceState.getParcelable("cardUri");
-            mUri = cardUri;
-            Log.v(LOG_TAG, "uri using uri from bundle" + mUri);
+            } else {
+                mUri = CardsContract.CardEntry.CONTENT_URI;
+                Log.v(LOG_TAG, "OCV called standard URI");
+            }
 
-        } else {
-            mUri = CardsContract.CardEntry.CONTENT_URI;
         }
 
+//            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+//            String existingCardJson = sharedPreferences.getString(getString(R.string.pref_card_titles_key), null);
+//            GsonBuilder builder = new GsonBuilder();
+//            Gson gson = builder.create();
+//            ArrayList<Card> mTitlesAndKeywords = (ArrayList<Card>) gson.fromJson(existingCardJson, new TypeToken<ArrayList<Card>>(){}.getType());
+//            Card car®d = mTitlesAndKeywords.get(0);
+//            String keywords = card.getKeywords();
+//            mUri = CardsContract.CardEntry.buildSingleCardUri(keywords);
+//            Log.v(LOG_TAG, "uri using uri from bundle" + mUri);
 
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
@@ -171,6 +176,7 @@ public class CardFragment extends Fragment implements LoaderManager.LoaderCallba
     @Override
     public void onSaveInstanceState(Bundle outState) {
         mStoryAdapter.onSaveInstanceState(outState);
+        outState.putParcelable("cardUri", mUri);
         super.onSaveInstanceState(outState);
     }
 
@@ -218,4 +224,5 @@ public class CardFragment extends Fragment implements LoaderManager.LoaderCallba
         newCardDialog.show(manager, DIALOG_TAG);
 
     }
+
 }

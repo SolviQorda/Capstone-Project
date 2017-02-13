@@ -99,9 +99,9 @@ if (mCardDetailsArrayList != null ) {
         mTabLayout.addTab(mTabLayout.newTab().setText(tabTitle));
         mTabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
         mTabLayout.setContentDescription(tabTitle);
-        Bundle titlePosition = new Bundle();
-        titlePosition.putInt("cardPosition", i);
-        Log.v(LOG_TAG, "bundle: " + titlePosition);
+//        Bundle titlePosition = new Bundle();
+//        titlePosition.putInt("cardPosition", i);
+//        Log.v(LOG_TAG, "bundle: " + titlePosition);
 //                cardFragment.onCreateLoader(0, titlePosition);
     }
 
@@ -143,7 +143,7 @@ if (mCardDetailsArrayList != null ) {
     public void addCard(ArrayList<Card> cardDetailsArrayList, Uri cardUri) {
 
         Bundle args = new Bundle();
-        args.putParcelable("URI", cardUri);
+        args.putParcelable("cardUri", cardUri);
         Log.v(LOG_TAG, "Card uri when added:" + cardUri);
 
         mTabLayout = (TabLayout) findViewById(R.id.main_tabs);
