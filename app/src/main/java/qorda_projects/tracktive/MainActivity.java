@@ -1,5 +1,6 @@
 package qorda_projects.tracktive;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
@@ -34,7 +35,7 @@ public class MainActivity extends AppCompatActivity implements KeywordsEntryDial
     public PagerAdapter mPagerAdapter;
     private TabLayout mTabLayout;
     private SharedPreferences mSharedPreferences;
-    public ArrayList<Card> mCardDetailsArrayList;
+    public ArrayList<Card> mTitlesAndKeywords;
     public List<CardFragment> mFragments;
 
 
@@ -50,9 +51,8 @@ public class MainActivity extends AppCompatActivity implements KeywordsEntryDial
 
         Uri cardUri = getIntent() != null ? getIntent().getData() : null;
 
-//        getExistingTitles();
-//        getExistingKeywords();
         getCardFragments();
+
 
         if (mFragments == null) {
             //If no pre-existing data then need to open up the dialog.
@@ -60,6 +60,8 @@ public class MainActivity extends AppCompatActivity implements KeywordsEntryDial
             DialogFragment newCardDialog = new KeywordsEntryDialog();
             FragmentManager manager = this.getSupportFragmentManager();
             newCardDialog.show(manager, DIALOG_TAG);
+
+
         }
 
 
@@ -78,7 +80,6 @@ public class MainActivity extends AppCompatActivity implements KeywordsEntryDial
 //                .findFragmentById(R.id.stories_fragment));
 
         mTabLayout = (TabLayout) findViewById(R.id.main_tabs);
-//          TODO: implement a set for titles and in the onClick
 
         mViewPager = (ViewPager) findViewById(R.id.main_pager);
 
@@ -92,9 +93,9 @@ public class MainActivity extends AppCompatActivity implements KeywordsEntryDial
 
         //cycle through card titles (for tabs).
 
-if (mCardDetailsArrayList != null ) {
-    for (int i = 0; i < mCardDetailsArrayList.size(); i++) {
-        Card card = mCardDetailsArrayList.get(i);
+if (mTitlesAndKeywords != null ) {
+    for (int i = 0; i < mTitlesAndKeywords.size(); i++) {
+        Card card = mTitlesAndKeywords.get(i);
         String tabTitle = card.getTitle();
         mTabLayout.addTab(mTabLayout.newTab().setText(tabTitle));
         mTabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
@@ -137,6 +138,16 @@ if (mCardDetailsArrayList != null ) {
 
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+    }
+
 
 
 
@@ -156,16 +167,16 @@ if (mCardDetailsArrayList != null ) {
         Log.v(LOG_TAG, "cardPosition" + cardPosition);
 //        args.putInt("position", cardPosition + 1);
 
-        mCardDetailsArrayList = cardDetailsArrayList;
+        mTitlesAndKeywords = cardDetailsArrayList;
 
 //        if (mTitleArrayList == null) {
 //            mTitleArrayList = new ArrayList<String>();
 //        }
 //
         int newCardPosition = mFragments.size();
-        Log.v(LOG_TAG, "cardDetailsArrayList in AddCard is: " + mCardDetailsArrayList);
+        Log.v(LOG_TAG, "cardDetailsArrayList in AddCard is: " + mTitlesAndKeywords);
 
-        Card card = mCardDetailsArrayList.get(newCardPosition);
+        Card card = mTitlesAndKeywords.get(newCardPosition);
         String cardKeywords = card.getKeywords();
         String tabTitle = card.getTitle();
         Log.v(LOG_TAG, "new card Position for " + tabTitle + " is " + newCardPosition);
@@ -205,22 +216,17 @@ if (mCardDetailsArrayList != null ) {
     private void getCardFragments() {
         List<CardFragment> cardFragmentList = new ArrayList<CardFragment>();
 
-        mCardDetailsArrayList = getExistingCardDetails();
-        if (mCardDetailsArrayList != null) {
-            Log.v(LOG_TAG, "cardDetailsArray contains: " + mCardDetailsArrayList);
-            for (int i = 0; i < mCardDetailsArrayList.size(); i++) {
-                Card card = mCardDetailsArrayList.get(i);
+        mTitlesAndKeywords = getExistingCardDetails(this);
+        if (mTitlesAndKeywords != null) {
+            Log.v(LOG_TAG, "cardDetailsArray contains: " + mTitlesAndKeywords);
+            for (int i = 0; i < mTitlesAndKeywords.size(); i++) {
+                Card card = mTitlesAndKeywords.get(i);
                 String cardTitle = card.getTitle();
                 //refactor into
                 String cardKeywords = card.getKeywords();
                 Log.v(LOG_TAG, "at position " + i + " cardTitle: " + cardTitle);
-                //bundle the URI
-                Bundle args = new Bundle();
-                Uri cardForKeywordUri = CardsContract.CardEntry.buildSingleCardUri(cardKeywords);
-                args.putParcelable("URI", cardForKeywordUri);
                 // add cardFragment to list of fragments
                 CardFragment cardFragment = CardFragment.newInstance(cardTitle, cardKeywords);
-                cardFragment.setArguments(args);
                 cardFragmentList.add(cardFragment);
 
                 mFragments = cardFragmentList;
@@ -232,8 +238,9 @@ if (mCardDetailsArrayList != null ) {
 
     }
 
-    private ArrayList<Card> getExistingCardDetails() {
-        String existingCardJson = mSharedPreferences.getString(getResources().getString(R.string.pref_card_titles_key), null);
+    public static ArrayList<Card> getExistingCardDetails(Context context) {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        String existingCardJson = sharedPreferences.getString(context.getString(R.string.pref_card_titles_key), null);
         GsonBuilder builder = new GsonBuilder();
         Gson gson = builder.create();
 
@@ -242,15 +249,16 @@ if (mCardDetailsArrayList != null ) {
         ArrayList<Card> mTitlesAndKeywords = (ArrayList<Card>) gson.fromJson(existingCardJson, new TypeToken<ArrayList<Card>>(){}.getType());
         return mTitlesAndKeywords;
     }
-//
-//    private ArrayList<String> getExistingKeywords() {
-//        Set<String> keywordSet = mSharedPreferences.getStringSet(getResources().getString(R.string.pref_keywords_key), null);
-//        //Cast Set to arrayList to iterate
-//        mKeywordArrayList = new ArrayList<String>();
-//        if (keywordSet != null) {
-//            mKeywordArrayList.addAll(keywordSet);
-//        }
-//        return mKeywordArrayList;
-//    }
+
+    public static Uri getcardUriFromFragmentPosition(int position, Context context) {
+
+        ArrayList<Card> titlesAndKeywords = getExistingCardDetails(context);
+        Card card = titlesAndKeywords.get(position);
+        String keywords = card.getKeywords();
+        Uri uriFromKeywords = CardsContract.CardEntry.buildSingleCardUri(keywords);
+        Log.v("utility", "Uri From fragment in position " + position + " is " + uriFromKeywords);
+        return uriFromKeywords;
+    }
+
 
 }

@@ -23,6 +23,8 @@ import io.github.yavski.fabspeeddial.FabSpeedDial;
 import io.github.yavski.fabspeeddial.SimpleMenuListenerAdapter;
 import qorda_projects.tracktive.data.CardsContract;
 
+import static android.util.Log.v;
+
 /**
  * Created by sorengoard on 09/01/2017.
  */
@@ -33,10 +35,14 @@ public class CardFragment extends Fragment implements LoaderManager.LoaderCallba
     public final String DIALOG_TAG = "new card dialog";
     static final String CARD_URI = "cardUri";
     public static Uri mUri;
+    private Uri mCardSpecificUri;
+    public static int mCardPosition;
 
     private StoryAdapter mStoryAdapter;
     private RecyclerView mCardRecyclerView;
     private int mChoiceMode;
+    private CardFragment mCardFragment;
+
 
     private static final int STORY_LOADER = 0;
 
@@ -67,40 +73,37 @@ public class CardFragment extends Fragment implements LoaderManager.LoaderCallba
 
         CardFragment cardFragment = new CardFragment();
         mUri = CardsContract.CardEntry.buildSingleCardUri(keywords);
-        Log.v(LOG_TAG, "uri @newInstance" + mUri);
+        v(LOG_TAG, "uri @newInstance" + mUri);
 
         Bundle args = new Bundle();
         args.putParcelable("cardUri", mUri);
 
-        cardFragment.setArguments(args);
         return cardFragment;
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if(savedInstanceState != null) {
+            mCardSpecificUri = savedInstanceState.getParcelable("localCardUri");
+            Log.v(LOG_TAG, "uri using card pos from bundle " + mCardSpecificUri);
+
+        } else {
+            if(mUri != null){
+                mCardSpecificUri = mUri;
+                Log.v(LOG_TAG, "no SIS uri, using uri from instance");
+            } else {
+                mCardSpecificUri = CardsContract.CardEntry.CONTENT_URI;
+                v(LOG_TAG, "OCV called standard URI");
+            }
+        }
+
     }
 
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        if(mUri == null) {
-            if(savedInstanceState != null) {
-                mUri = savedInstanceState.getParcelable(CARD_URI);
-                Log.v(LOG_TAG, "uri using card pos from bundle" + mUri);
-
-            } else {
-                mUri = CardsContract.CardEntry.CONTENT_URI;
-                Log.v(LOG_TAG, "OCV called standard URI");
-            }
-
-        }
-
-//            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
-//            String existingCardJson = sharedPreferences.getString(getString(R.string.pref_card_titles_key), null);
-//            GsonBuilder builder = new GsonBuilder();
-//            Gson gson = builder.create();
-//            ArrayList<Card> mTitlesAndKeywords = (ArrayList<Card>) gson.fromJson(existingCardJson, new TypeToken<ArrayList<Card>>(){}.getType());
-//            Card car®d = mTitlesAndKeywords.get(0);
-//            String keywords = card.getKeywords();
-//            mUri = CardsContract.CardEntry.buildSingleCardUri(keywords);
-//            Log.v(LOG_TAG, "uri using uri from bundle" + mUri);
 
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
@@ -137,7 +140,7 @@ public class CardFragment extends Fragment implements LoaderManager.LoaderCallba
                 int id = menuItem.getItemId();
 
                 if(id == R.id.new_card){
-                    Log.v(LOG_TAG, "add card called");
+                    v(LOG_TAG, "add card called");
                     openNewCardDialog();
                     return true;
                 }
@@ -176,7 +179,7 @@ public class CardFragment extends Fragment implements LoaderManager.LoaderCallba
     @Override
     public void onSaveInstanceState(Bundle outState) {
         mStoryAdapter.onSaveInstanceState(outState);
-        outState.putParcelable("cardUri", mUri);
+        outState.putParcelable("localCardUri", mCardSpecificUri);
         super.onSaveInstanceState(outState);
     }
 
@@ -185,7 +188,7 @@ public class CardFragment extends Fragment implements LoaderManager.LoaderCallba
         String sortOrder = CardsContract.CardEntry.COLUMN_DATE+ " ASC";
 
         return new CursorLoader(getActivity(),
-            mUri,
+            mCardSpecificUri,
             STORY_COLUMNS,
             null,
             null,
@@ -195,7 +198,7 @@ public class CardFragment extends Fragment implements LoaderManager.LoaderCallba
 
     @Override
     public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
-        Log.v(LOG_TAG, "storyAdapter count: " + mStoryAdapter.getItemCount());
+        v(LOG_TAG, "storyAdapter count: " + mStoryAdapter.getItemCount());
         mStoryAdapter.swapCursor(cursor);
 
 //        updateEmptyView(0;
@@ -210,6 +213,9 @@ public class CardFragment extends Fragment implements LoaderManager.LoaderCallba
     @Override
     public void onDestroy() {
         super.onDestroy();
+        Bundle args = new Bundle();
+        args.putParcelable("localCardUri", mCardSpecificUri);
+        onSaveInstanceState(args);
         if(null != mCardRecyclerView) {
             mCardRecyclerView.clearOnScrollListeners();
         }
