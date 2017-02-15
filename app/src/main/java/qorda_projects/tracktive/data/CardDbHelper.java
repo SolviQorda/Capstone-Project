@@ -29,7 +29,7 @@ public class CardDbHelper extends SQLiteOpenHelper{
                 CardsContract.CardEntry.COLUMN_URL + " TEXT NOT NULL," +
                 CardsContract.CardEntry.COLUMN_CONTENT + " TEXT NOT NULL," +
                 CardsContract.CardEntry.COLUMN_CARD_KEYWORDS + " TEXT NOT NULL," +
-                CardsContract.CardEntry.COLUMN_BOOKMARKED + " INTEGER NOT NULL " +
+                CardsContract.CardEntry.COLUMN_BOOKMARKED + " TEXT NOT NULL " +
                 " );";
 
         final String SQL_CREATE_DIARY_TABLE = "CREATE TABLE " + CardsContract.DiaryEntry.TABLE_NAME + " (" +

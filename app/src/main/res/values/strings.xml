@@ -40,4 +40,13 @@
     <string name="pref_card_titles_label">Card Titles</string>
     <string name="pref_card_title_default">Migrant justice</string>
 
+    <!--STORY DETAIL -->
+    <!-- defaults-->
+    <string name="story_default_title">Fracking hits all time high</string>
+    <string name="story_default_content">Detail view for a news story - browser icon indicates that the whole article can be read online, will use an implicit intent to handle the URL. Bookmark icon is by default in grey</string>
+    <string name="story_default_source">Manchester Evening News</string>
+    <string name="story_default_date">7-11-17</string>
+    <string name="story_detail_added_to_bookmarks">Story added to bookmarks!</string>
+    <string name="story_detail_removed_from_bookmarks">Story removed from bookmarks!</string>
+
 </resources>

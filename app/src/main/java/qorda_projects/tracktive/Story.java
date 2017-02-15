@@ -11,17 +11,15 @@ public class Story  {
     private String mDate;
     private String mSource;
     private String mUrl;
-    private int mCardInt;
-    private int mBookmarked;
-    private String[] mKeywords;
+    private String mBookmarked;
+    private String mKeywords;
 
-    public Story(String title, String content, String date, String source, String url, int cardInt, int bookmarked, String[] keywords) {
+    public Story(String title, String content, String date, String source, String url, String bookmarked, String keywords) {
         mTitle = title;
         mContent = content;
         mDate = date;
         mSource = source;
         mUrl = url;
-        mCardInt = cardInt;
         mBookmarked = bookmarked;
         mKeywords = keywords;
     }
@@ -62,23 +60,15 @@ public class Story  {
 
     public void setUrl(String url) {this.mUrl = url;}
 
-    public int getCardInt() {
-        return mCardInt;
-    }
-
-    public void setCardInt(int cardInt) {
-        this.mCardInt = cardInt;
-    }
-
-    public int getBookmarked() {
+    public String getBookmarked() {
         return mBookmarked;
     }
 
-    public void setBookmarked(int bookmarked){
+    public void setBookmarked(String bookmarked){
         this.mBookmarked = bookmarked;
     }
 
-    public String[] getKeywords() {return mKeywords;}
+    public String getKeywords() {return mKeywords;}
 
-    public void setKeywords(String[] keywords) {this.mKeywords = keywords;}
+    public void setKeywords(String keywords) {this.mKeywords = keywords;}
 }

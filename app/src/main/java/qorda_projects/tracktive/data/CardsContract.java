@@ -14,6 +14,7 @@ public class CardsContract {
     //TODO check this
     public static final String CONTENT_AUTHORITY = "qorda_projects.tracktive.app";
     public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
+    public static final String BOOKMARKS = "bookmarks";
 
     //possible paths
     public static final String PATH_CARDS = "cards";
@@ -45,6 +46,10 @@ public class CardsContract {
         //either string keywords, or do the call to the Utility method based on passing an int to this method. remember needs context.
         public static Uri buildSingleCardUri(String keywords) {
             return CONTENT_URI.buildUpon().appendPath(keywords).build();
+        }
+
+        public static Uri buildBookmarkedStoriesUri(String keywords) {
+            return CONTENT_URI.buildUpon().appendPath(BOOKMARKS).appendPath(keywords).build();
         }
 
         public static String getKeywordsFromUri(Uri uri) {

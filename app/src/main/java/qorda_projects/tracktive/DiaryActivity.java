@@ -13,6 +13,7 @@ public class DiaryActivity extends AppCompatActivity {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 
         //diary doesn't have tabbed browsing, but the back button. So does it need a fragment? Presumably for the master/detail view, yes.
 

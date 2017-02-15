@@ -98,7 +98,7 @@ public class StoryAdapter extends RecyclerView.Adapter<StoryAdapter.StoryAdapter
         String date = mCursor.getString(CardFragment.COL_STORY_DATE);
         storyAdapterViewHolder.mDateView.setText(date);
 
-        int bookmarked = mCursor.getInt(CardFragment.COL_STORY_BOOKMARKED);
+        String bookmarked = mCursor.getString(CardFragment.COL_STORY_BOOKMARKED);
         int drawableId = Utility.bookmarkedOrNot(bookmarked);
 
         storyAdapterViewHolder.mBookmarked.setImageDrawable(mContext.getDrawable(drawableId));

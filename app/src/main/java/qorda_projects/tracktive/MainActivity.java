@@ -1,6 +1,7 @@
 package qorda_projects.tracktive;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
@@ -27,7 +28,7 @@ import java.util.List;
 import qorda_projects.tracktive.data.CardsContract;
 import qorda_projects.tracktive.sync.TracktiveSyncAdapter;
 
-public class MainActivity extends AppCompatActivity implements KeywordsEntryDialog.keywordsDialogListener {
+public class MainActivity extends AppCompatActivity implements KeywordsEntryDialog.keywordsDialogListener, CardFragment.Callback {
 
     public final String DIALOG_TAG = "new card dialog";
     private final String LOG_TAG = MainActivity.class.getSimpleName().toString();
@@ -146,6 +147,26 @@ if (mTitlesAndKeywords != null ) {
     @Override
     public void onStop() {
         super.onStop();
+    }
+
+    @Override
+    public void onItemSelected(Uri contentUri) {
+//        if(mTwoPane) {
+//            Bundle args = new Bundle();
+//
+//            args.putParcelable("URI", contentUri);
+//
+//            DetailFragment fragment = new DetailFragment();
+//            fragment.setArguments(args);
+//
+//            getSupportFragmentManager().beginTransaction()
+//                    .replace(R.id.movie_detail_container, fragment, DETAILFRAGMENT_TAG)
+//                    .commit();
+//        } else {
+            Intent intent = new Intent(this, StoryDetailActivity.class)
+                    .setData(contentUri);
+            startActivity(intent);
+//        }
     }
 
 
