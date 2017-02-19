@@ -54,6 +54,8 @@ public class TracktiveSyncAdapter extends AbstractThreadedSyncAdapter {
 //
     public static final int SYNC_FLEXTIME = SYNC_INTERVAL/3;
 
+    private int mTabNumber;
+
     ContentResolver mContentResolver;
 
     @Retention(RetentionPolicy.SOURCE)
@@ -157,6 +159,9 @@ public class TracktiveSyncAdapter extends AbstractThreadedSyncAdapter {
                     }
                     storiesJsonStr = buffer.toString();
                     Log.v(LOG_TAG, "stories JSON: " + storiesJsonStr);
+
+                    // adding tab number
+                    mTabNumber = i;
                     getStoriesDataFromJson(storiesJsonStr, keywordsQuery);
 
                 } catch (IOException e) {
@@ -227,12 +232,15 @@ public class TracktiveSyncAdapter extends AbstractThreadedSyncAdapter {
                 String date;
                 String url;
                 String source;
+                int tabNumber;
 
                 JSONObject StoryObject = storiesArray.getJSONObject(i);
                 title = StoryObject.getString(ER_TITLE);
                 body = StoryObject.getString(ER_BODY);
                 url = StoryObject.getString(ER_URL);
                 date = StoryObject.getString(ER_DATE);
+                tabNumber = mTabNumber;
+                Log.v(LOG_TAG, "tabNumber inside getStoriesDataFromJSON: " + tabNumber);
                 //TODO: pull this from sharedPrefs like above
                 String keywordsQuery = queryKeywords;
 
@@ -249,6 +257,7 @@ public class TracktiveSyncAdapter extends AbstractThreadedSyncAdapter {
                 storyValues.put(CardsContract.CardEntry.COLUMN_SOURCE, source);
                 storyValues.put(CardsContract.CardEntry.COLUMN_CARD_KEYWORDS, keywordsQuery);
                 storyValues.put(CardsContract.CardEntry.COLUMN_BOOKMARKED, 0);
+                storyValues.put(CardsContract.CardEntry.COLUMN_TAB_NUMBER, tabNumber);
                 // pull from the same variable we use to get the original json query in the onPerformSync above
                 cvVector.add(storyValues);
 

@@ -21,7 +21,10 @@ public class ContentProvider extends android.content.ContentProvider {
 
     static final int CARDS = 100;
     static final int SINGLE_CARD = 101;
+    static final int SINGLE_STORY = 102;
+    static final int BOOKMARKED = 103;
     static final int DIARY = 200;
+    static final int SINGLE_ENTRY = 201;
 
     private static final SQLiteQueryBuilder sCardsByKeywordsQueryBuilder;
     private static final SQLiteQueryBuilder sDiaryByKeywordsBuilder;
@@ -38,8 +41,14 @@ public class ContentProvider extends android.content.ContentProvider {
     private static final String sKeywordsForCardSetting =
             CardsContract.CardEntry.TABLE_NAME + "." + CardsContract.CardEntry.COLUMN_CARD_KEYWORDS + " = ? ";
 
+//    private static final String sIdForSingleSingleStorySetting =
+//            CardsContract.CardEntry.TABLE_NAME + "." + CardsContract.CardEntry._ID + " = ? ";
+
     private static final String sDiaryForCardSetting =
             CardsContract.DiaryEntry.TABLE_NAME + "." + CardsContract.DiaryEntry.COLUMN_CARD_KEYWORDS + " = ? ";
+
+    private static final String sSingleDiaryEntrySetting =
+            CardsContract.DiaryEntry.TABLE_NAME + "." + CardsContract.DiaryEntry._ID + " = ? ";
 
 
 
@@ -64,8 +73,25 @@ public class ContentProvider extends android.content.ContentProvider {
                 null,
                 sortOrder);
 
-
     }
+
+//    private Cursor getSingleStorybyIdSetting(Uri uri, String[] projection, String sortOrder) {
+//
+//        String id = CardsContract.CardEntry.getIdFromUri(uri);
+//
+//        String[] selectionArgs;
+//        String selection = sIdForSingleSingleStorySetting;
+//
+//        selectionArgs = new String[]{id};
+//
+//        return sStoryByIdBuilder.query(mCardDbHelper.getReadableDatabase(),
+//            projection,
+//            selection,
+//            selectionArgs,
+//            null,
+//            null,
+//            sortOrder);
+//    }
 
     static UriMatcher buildUriMatcher() {
         final UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
@@ -74,8 +100,14 @@ public class ContentProvider extends android.content.ContentProvider {
         matcher.addURI(authority, CardsContract.PATH_CARDS, CARDS);
         //matcher for a single card based on keywords
         matcher.addURI(authority, CardsContract.PATH_CARDS + "/*" , SINGLE_CARD);
+        //matcher for a single story
+        matcher.addURI(authority, CardsContract.PATH_CARDS + "/story" + "/*", SINGLE_STORY);
+        //matcher for bookmarked stories in a card
+        matcher.addURI(authority, CardsContract.PATH_CARDS + "/bookmarks" + "/*", BOOKMARKED);
         // matcher for a diary based on keywords
-        matcher.addURI(authority, CardsContract.PATH_DIARY, DIARY);
+        matcher.addURI(authority, CardsContract.PATH_DIARY + "/*", DIARY);
+        //matcher for diary entry based on id
+        matcher.addURI(authority, CardsContract.PATH_DIARY + "/entry" + "/*", SINGLE_ENTRY);
 
         //TODO: add other cases, eg diary
 
@@ -101,6 +133,15 @@ public class ContentProvider extends android.content.ContentProvider {
             case SINGLE_CARD:
                 Log.v(LOG_TAG, "single card type called in GetType");
                 return CardsContract.CardEntry.CONTENT_TYPE;
+            case SINGLE_STORY:
+                Log.v(LOG_TAG, "single story type called in GetType");
+                return CardsContract.CardEntry.CONTENT_ITEM_TYPE;
+            case BOOKMARKED:
+                Log.v(LOG_TAG, "bookmarked type called in GetType");
+                return CardsContract.CardEntry.CONTENT_TYPE;
+            case DIARY:
+                Log.v(LOG_TAG, "diary type called in GetType");
+                return CardsContract.DiaryEntry.CONTENT_TYPE;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -147,6 +188,12 @@ public class ContentProvider extends android.content.ContentProvider {
                 retCursor = getCardStoriesByKeywordsSetting(uri, projection, sortOrder);
                 break;
             }
+//            case SINGLE_STORY:
+//                Log.v(LOG_TAG, "single story type called in query");
+//            {
+//                retCursor = getSingleStorybyIdSetting(uri, projection, sortOrder);
+//                break;
+//            }
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
 

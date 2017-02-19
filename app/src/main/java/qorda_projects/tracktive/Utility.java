@@ -36,7 +36,7 @@ public class Utility {
 
     public static int bookmarkedOrNot(String bookmarked){
 
-        if (bookmarked.equals("0")) {
+        if (bookmarked.equals("1")) {
             return R.drawable.ic_bookmark_green;
         } else {
             return R.drawable.ic_bookmark_black_48dp;

@@ -1,10 +1,17 @@
 package qorda_projects.tracktive;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import com.google.android.gms.maps.internal.MapLifecycleDelegate;
+
+import static android.R.attr.data;
+
 /**
  * Created by sorengoard on 10/01/2017.
  */
 
-public class Story  {
+public class Story implements Parcelable {
 
     private String mTitle;
     private String mContent;
@@ -13,8 +20,9 @@ public class Story  {
     private String mUrl;
     private String mBookmarked;
     private String mKeywords;
+    private int mTabNumber;
 
-    public Story(String title, String content, String date, String source, String url, String bookmarked, String keywords) {
+    public Story(String title, String content, String date, String source, String url, String bookmarked, String keywords, int tabNumber) {
         mTitle = title;
         mContent = content;
         mDate = date;
@@ -22,6 +30,7 @@ public class Story  {
         mUrl = url;
         mBookmarked = bookmarked;
         mKeywords = keywords;
+        mTabNumber = tabNumber;
     }
 
     public String getTitle() {
@@ -71,4 +80,53 @@ public class Story  {
     public String getKeywords() {return mKeywords;}
 
     public void setKeywords(String keywords) {this.mKeywords = keywords;}
+
+    public int getTabNumber() {return mTabNumber;}
+
+    public void setTabNumber(int tabNumber) {this.mTabNumber = tabNumber;}
+
+
+    //make this parcelable.
+
+    protected Story(Parcel in) {
+
+        mTitle = in.readString();
+        mContent = in.readString();
+        mDate = in.readString();
+        mSource = in.readString();
+        mUrl = in.readString();
+        mBookmarked = in.readString();
+        mKeywords = in.readString();
+        mTabNumber = in.readInt();
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(mTitle);
+        dest.writeString(mContent);
+        dest.writeString(mDate);
+        dest.writeString(mSource);
+        dest.writeString(mUrl);
+        dest.writeString(mBookmarked);
+        dest.writeString(mKeywords);
+        dest.writeInt(mTabNumber);
+    }
+
+    @SuppressWarnings("unused")
+    public static final Parcelable.Creator<Story> CREATOR = new Parcelable.Creator<Story>() {
+        @Override
+        public Story createFromParcel(Parcel in) {
+            return new Story(in);
+        }
+
+        @Override
+        public Story[] newArray(int size) {
+            return new Story[size];
+        }
+    };
 }

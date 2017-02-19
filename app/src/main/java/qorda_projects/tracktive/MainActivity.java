@@ -3,12 +3,16 @@ package qorda_projects.tracktive;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -28,7 +32,7 @@ import java.util.List;
 import qorda_projects.tracktive.data.CardsContract;
 import qorda_projects.tracktive.sync.TracktiveSyncAdapter;
 
-public class MainActivity extends AppCompatActivity implements KeywordsEntryDialog.keywordsDialogListener, CardFragment.Callback {
+public class MainActivity extends AppCompatActivity implements KeywordsEntryDialog.keywordsDialogListener, LoaderManager.LoaderCallbacks<Cursor> {
 
     public final String DIALOG_TAG = "new card dialog";
     private final String LOG_TAG = MainActivity.class.getSimpleName().toString();
@@ -38,6 +42,38 @@ public class MainActivity extends AppCompatActivity implements KeywordsEntryDial
     private SharedPreferences mSharedPreferences;
     public ArrayList<Card> mTitlesAndKeywords;
     public List<CardFragment> mFragments;
+    private ArrayList<Story> mStories;
+    private Uri mUri;
+
+    private static final int STORY_LOADER = 0;
+
+    private static final String[] STORY_COLUMNS = {
+            CardsContract.CardEntry.TABLE_NAME + "." + CardsContract.CardEntry._ID,
+            CardsContract.CardEntry.COLUMN_TITLE,
+            CardsContract.CardEntry.COLUMN_DATE,
+            CardsContract.CardEntry.COLUMN_CONTENT,
+            CardsContract.CardEntry.COLUMN_SOURCE,
+            CardsContract.CardEntry.COLUMN_BOOKMARKED,
+            CardsContract.CardEntry.COLUMN_CARD_KEYWORDS,
+            CardsContract.CardEntry.COLUMN_URL,
+            CardsContract.CardEntry.COLUMN_TAB_NUMBER
+    };
+
+    static final int COL_CARD_ID = 0;
+    static final int COL_STORY_TITLE = 1;
+    static final int COL_STORY_DATE = 2;
+    static final int COL_STORY_CONTENT = 3;
+    static final int COL_STORY_SOURCE = 4;
+    static final int COL_STORY_BOOKMARKED = 5;
+    static final int COL_STORY_KEYWORDS = 6;
+    static final int COL_STORY_URL = 7;
+    static final int COL_STORY_TAB_NUMBER = 8;
+
+    public interface Callback {
+        public void onItemSelected(Uri movieUri);
+    }
+
+
 
 
     @Override
@@ -50,20 +86,21 @@ public class MainActivity extends AppCompatActivity implements KeywordsEntryDial
         setSupportActionBar(toolbar);
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
-        Uri cardUri = getIntent() != null ? getIntent().getData() : null;
+        mUri = CardsContract.CardEntry.CONTENT_URI;
 
-        getCardFragments();
+        getSupportLoaderManager().initLoader(0, null, this);
 
 
-        if (mFragments == null) {
-            //If no pre-existing data then need to open up the dialog.
+        //If no pre-existing data then need to open up the dialog.
+        ArrayList<Card> existingCardDetails = getExistingCardDetails(this);
+
+        if (existingCardDetails == null) {
             mFragments = new ArrayList<CardFragment>();
             DialogFragment newCardDialog = new KeywordsEntryDialog();
             FragmentManager manager = this.getSupportFragmentManager();
             newCardDialog.show(manager, DIALOG_TAG);
-
-
         }
+
 
 
         //handle whether to go to 2-pane mode or not here
@@ -80,6 +117,7 @@ public class MainActivity extends AppCompatActivity implements KeywordsEntryDial
 //        CardFragment cardFragment = ((CardFragment) getSupportFragmentManager()
 //                .findFragmentById(R.id.stories_fragment));
 
+
         mTabLayout = (TabLayout) findViewById(R.id.main_tabs);
 
         mViewPager = (ViewPager) findViewById(R.id.main_pager);
@@ -87,9 +125,7 @@ public class MainActivity extends AppCompatActivity implements KeywordsEntryDial
         mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(mTabLayout));
         mTabLayout.setTabMode(TabLayout.MODE_SCROLLABLE);
 
-        mPagerAdapter = new CardPagerAdapter(
-                getSupportFragmentManager(), mFragments);
-        mViewPager.setAdapter(mPagerAdapter);
+
 
 
         //cycle through card titles (for tabs).
@@ -101,11 +137,12 @@ if (mTitlesAndKeywords != null ) {
         mTabLayout.addTab(mTabLayout.newTab().setText(tabTitle));
         mTabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
         mTabLayout.setContentDescription(tabTitle);
-//        Bundle titlePosition = new Bundle();
-//        titlePosition.putInt("cardPosition", i);
+
 //        Log.v(LOG_TAG, "bundle: " + titlePosition);
 //                cardFragment.onCreateLoader(0, titlePosition);
     }
+
+
 
 }
 
@@ -114,7 +151,26 @@ if (mTitlesAndKeywords != null ) {
 
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
+                //need to deliver this to the card fragment, how do I set it?
+
                 mViewPager.setCurrentItem(tab.getPosition());
+                int tabNumber = tab.getPosition();
+                ArrayList<Story> storiesForFragment = new ArrayList<Story>();
+                for(int i = 0; i <mStories.size(); i++) {
+                    Story story = mStories.get(i);
+                    int storyTabNumber = story.getTabNumber();
+                    if(storyTabNumber == tabNumber) {
+                        storiesForFragment.add(story);
+                    }
+                    CardFragment cardFragment = mFragments.get(tabNumber);
+                    Bundle args = new Bundle();
+                    args.putParcelableArrayList("cardStoriesArrayList", storiesForFragment);
+                    cardFragment.setArguments(args);
+
+
+                }
+                //set cardFragment with bundle arrayList
+
 
             }
 
@@ -131,11 +187,16 @@ if (mTitlesAndKeywords != null ) {
         });
 
 
-        if (mFragments != null) {
+
+
+        if (existingCardDetails != null) {
+
             TracktiveSyncAdapter.initializeSyncAdapter(this);
 
             TracktiveSyncAdapter.syncImmediately(this);
         }
+
+
 
     }
 
@@ -149,7 +210,6 @@ if (mTitlesAndKeywords != null ) {
         super.onStop();
     }
 
-    @Override
     public void onItemSelected(Uri contentUri) {
 //        if(mTwoPane) {
 //            Bundle args = new Bundle();
@@ -167,6 +227,70 @@ if (mTitlesAndKeywords != null ) {
                     .setData(contentUri);
             startActivity(intent);
 //        }
+    }
+
+    //Content Loader classes
+
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int it, Bundle bundle) {
+        String sortOrder = CardsContract.CardEntry.COLUMN_DATE+ " ASC";
+        return new CursorLoader(this,
+                mUri,
+                STORY_COLUMNS,
+                null,
+                null,
+                sortOrder);
+
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
+        if (mStories != null) {
+            mStories.clear();
+        } else {
+            mStories = new ArrayList<Story>();
+        }
+        if(cursor!= null && cursor.moveToFirst()){
+            for(int i = 0;i < cursor.getCount();i++) {
+                cursor.moveToPosition(i);
+                String title = cursor.getString(COL_STORY_TITLE);
+                String content = cursor.getString(COL_STORY_CONTENT);
+                String date = cursor.getString(COL_STORY_DATE);
+                String source = cursor.getString(COL_STORY_SOURCE);
+                String url = cursor.getString(COL_STORY_URL);
+                String bookmarked = cursor.getString(COL_STORY_BOOKMARKED);
+                String keywords = cursor.getString(COL_STORY_KEYWORDS);
+                int tabNumber = cursor.getInt(COL_STORY_TAB_NUMBER);
+
+                Story story = new Story(title, content, date, source, url, bookmarked, keywords, tabNumber);
+                mStories.add(story);
+            }
+            if(mStories!= null) {
+                getCardFragments();
+                mPagerAdapter = new CardPagerAdapter(
+                        getSupportFragmentManager(), mFragments);
+                mViewPager.setAdapter(mPagerAdapter);
+
+            }
+
+            Log.v("LOG_TAG", "mStories in OLF: " + mStories);
+        }
+
+
+//        mStoryAdapter.swapCursor(cursor);
+        if( cursor.getCount() == 0) {
+            this.supportStartPostponedEnterTransition();
+
+        } else {
+            //loop through existing stories
+        }
+    }
+
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+//        mStoryAdapter.swapCursor(null);
     }
 
 
@@ -214,6 +338,8 @@ if (mTitlesAndKeywords != null ) {
 
         mPagerAdapter.notifyDataSetChanged();
 
+        getSupportLoaderManager().initLoader(0, null, this);
+
 
         Toast.makeText(this, "Card made successfully!", Toast.LENGTH_LONG).show();
     }
@@ -246,9 +372,30 @@ if (mTitlesAndKeywords != null ) {
                 //refactor into
                 String cardKeywords = card.getKeywords();
                 Log.v(LOG_TAG, "at position " + i + " cardTitle: " + cardTitle);
-                // add cardFragment to list of fragments
+                // get relevant story data
+                ArrayList<Story> storiesForFragment = new ArrayList<Story>();
+                if (mStories!=null) {
+                    for (int q = 0; q < mStories.size(); q++) {
+                        Story story = mStories.get(q);
+                        int storyTabNumber = story.getTabNumber();
+                        if (storyTabNumber == i) {
+                            storiesForFragment.add(story);
+                        }
+                    }
+                }
+                 Bundle args  = new Bundle();
+                if(storiesForFragment!=null) {
+                    args.putParcelableArrayList("cardStoriesArrayList", storiesForFragment);
+                }
+
+                    // add cardFragment to list of fragments
                 CardFragment cardFragment = CardFragment.newInstance(cardTitle, cardKeywords);
+                cardFragment.setArguments(args);
                 cardFragmentList.add(cardFragment);
+
+
+
+                //TODO: is this where to handle a loader? Want to loop through.
 
                 mFragments = cardFragmentList;
             }

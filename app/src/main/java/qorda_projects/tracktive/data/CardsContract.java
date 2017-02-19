@@ -4,6 +4,10 @@ import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.net.Uri;
 import android.provider.BaseColumns;
+import android.util.Log;
+
+import static qorda_projects.tracktive.sync.TracktiveSyncAdapter.LOG_TAG;
+
 
 /**
  * Created by sorengoard on 09/01/2017.
@@ -11,23 +15,25 @@ import android.provider.BaseColumns;
 
 public class CardsContract {
 
+
+
     //TODO check this
     public static final String CONTENT_AUTHORITY = "qorda_projects.tracktive.app";
     public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
     public static final String BOOKMARKS = "bookmarks";
+    public static final String STORY = "story";
 
     //possible paths
     public static final String PATH_CARDS = "cards";
     public static final String PATH_DIARY = "diary";
-    public static final String PATH_SINGLE_CARD = "single_card";
+    public static final String PATH_SINGLE_STORY = "single_card";
 
     public static final class CardEntry implements BaseColumns {
 
         public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon().appendPath(PATH_CARDS).build();
 
         public static final String CONTENT_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_CARDS;
-        public static final String CONTENT_ITEM_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_CARDS + "/" + PATH_SINGLE_CARD;
-
+        public static final String CONTENT_ITEM_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_CARDS;
 
         public static final String TABLE_NAME = "cards";
 
@@ -38,6 +44,7 @@ public class CardsContract {
         public static final String COLUMN_CONTENT = "body";
         public static final String COLUMN_CARD_KEYWORDS = "card_keywords";
         public static final String COLUMN_BOOKMARKED = "bookmarked";
+        public static final String COLUMN_TAB_NUMBER = "tab_number";
 
         public static Uri buildCardsUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
@@ -48,6 +55,10 @@ public class CardsContract {
             return CONTENT_URI.buildUpon().appendPath(keywords).build();
         }
 
+        public static Uri buildSingleStoryUri(String storyId) {
+            return CONTENT_URI.buildUpon().appendPath(STORY).appendPath(storyId).build();
+        }
+
         public static Uri buildBookmarkedStoriesUri(String keywords) {
             return CONTENT_URI.buildUpon().appendPath(BOOKMARKS).appendPath(keywords).build();
         }
@@ -56,6 +67,12 @@ public class CardsContract {
             //TODO: find path segments that correspond to keywords  - what does 1 do?
             return uri.getPathSegments().get(1);
         }
+
+        public static String getIdFromUri(Uri uri) {
+            String id = uri.getPathSegments().get(2);
+            Log.v(LOG_TAG, "getidfromUri is: " + id);
+            return id;
+            }
     }
 
     public static final class DiaryEntry implements BaseColumns {

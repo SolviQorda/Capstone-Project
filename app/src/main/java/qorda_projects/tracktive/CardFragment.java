@@ -1,15 +1,11 @@
 package qorda_projects.tracktive;
 
 import android.content.Intent;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.content.Loader;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -23,7 +19,6 @@ import java.util.ArrayList;
 
 import io.github.yavski.fabspeeddial.FabSpeedDial;
 import io.github.yavski.fabspeeddial.SimpleMenuListenerAdapter;
-import qorda_projects.tracktive.data.CardsContract;
 
 import static android.util.Log.v;
 
@@ -31,7 +26,7 @@ import static android.util.Log.v;
  * Created by sorengoard on 09/01/2017.
  */
 
-public class CardFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>{
+public class CardFragment extends Fragment{
 
     private static final String LOG_TAG = CardFragment.class.getSimpleName().toString();
     public final String DIALOG_TAG = "new card dialog";
@@ -46,44 +41,13 @@ public class CardFragment extends Fragment implements LoaderManager.LoaderCallba
     private ArrayList<Story> mStories;
 
 
-    private static final int STORY_LOADER = 0;
 
 
-
-    private static final String[] STORY_COLUMNS = {
-            CardsContract.CardEntry.TABLE_NAME + "." + CardsContract.CardEntry._ID,
-            CardsContract.CardEntry.COLUMN_TITLE,
-            CardsContract.CardEntry.COLUMN_DATE,
-            CardsContract.CardEntry.COLUMN_CONTENT,
-            CardsContract.CardEntry.COLUMN_SOURCE,
-            CardsContract.CardEntry.COLUMN_BOOKMARKED,
-            CardsContract.CardEntry.COLUMN_CARD_KEYWORDS,
-            CardsContract.CardEntry.COLUMN_URL
-    };
-
-    static final int COL_CARD_ID = 0;
-    static final int COL_STORY_TITLE = 1;
-    static final int COL_STORY_DATE = 2;
-    static final int COL_STORY_CONTENT = 3;
-    static final int COL_STORY_SOURCE = 4;
-    static final int COL_STORY_BOOKMARKED = 5;
-    static final int COL_STORY_KEYWORDS = 6;
-    static final int COL_STORY_URL = 7;
-
-
-    public interface Callback {
-        public void onItemSelected(Uri movieUri);
-    }
 
 
     public static final CardFragment newInstance(String title, String keywords) {
 
         CardFragment cardFragment = new CardFragment();
-        mUri = CardsContract.CardEntry.buildSingleCardUri(keywords);
-        v(LOG_TAG, "uri @newInstance" + mUri);
-
-        Bundle args = new Bundle();
-        args.putParcelable("localCardUri", mUri);
 
         return cardFragment;
     }
@@ -91,23 +55,13 @@ public class CardFragment extends Fragment implements LoaderManager.LoaderCallba
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        if(mStories != null) {
-            Story story = mStories.get(0);
-            String keywords = story.getKeywords();
-            mCardSpecificUri = CardsContract.CardEntry.buildSingleCardUri(keywords);
-            Log.v(LOG_TAG, "uri using mStories " + mCardSpecificUri);
-
-        } else {
-            if(mUri != null){
-                mCardSpecificUri = mUri;
-                Log.v(LOG_TAG, "no SIS uri, using uri from instance");
-            } else {
-                mCardSpecificUri = CardsContract.CardEntry.CONTENT_URI;
-                Log.v(LOG_TAG, "OCV called standard URI");
+        Bundle b = this.getArguments();
+        if(mStories == null) {
+            if(b != null) {
+                b.getParcelableArrayList("cardStoriesArrayList");
+                Log.v(LOG_TAG, "mStories taken from SIS bundle " + mStories);
             }
         }
-
     }
 
 
@@ -132,10 +86,11 @@ public class CardFragment extends Fragment implements LoaderManager.LoaderCallba
             @Override
             public void onClick(StoryAdapter.StoryAdapterViewHolder viewHolder) {
 
-                ((Callback) getActivity()).onItemSelected(mUri);
+
+//                ((Callback) getActivity()).onItemSelected();
 
             }
-        }, emptyView, AbsListView.CHOICE_MODE_NONE);
+        }, emptyView, AbsListView.CHOICE_MODE_NONE, mStories);
 
         mCardRecyclerView.setAdapter(mStoryAdapter);
 
@@ -182,9 +137,9 @@ public class CardFragment extends Fragment implements LoaderManager.LoaderCallba
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
 
-        getLoaderManager().initLoader(STORY_LOADER, null, this);
         super.onActivityCreated(savedInstanceState);
     }
+
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
@@ -193,54 +148,6 @@ public class CardFragment extends Fragment implements LoaderManager.LoaderCallba
         super.onSaveInstanceState(outState);
     }
 
-    @Override
-    public Loader<Cursor> onCreateLoader(int it, Bundle bundle) {
-        String sortOrder = CardsContract.CardEntry.COLUMN_DATE+ " ASC";
-        return new CursorLoader(getActivity(),
-            mCardSpecificUri,
-            STORY_COLUMNS,
-            null,
-            null,
-            sortOrder);
-
-    }
-
-    @Override
-    public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
-        v(LOG_TAG, "storyAdapter count: " + mStoryAdapter.getItemCount());
-        if (mStories != null) {
-            mStories.clear();
-        } else {
-            mStories = new ArrayList<Story>();
-        }
-        if(cursor!= null && cursor.moveToFirst()){
-            for(int i = 0;i < cursor.getCount();i++) {
-                cursor.moveToPosition(i);
-                String title = cursor.getString(COL_STORY_TITLE);
-                String content = cursor.getString(COL_STORY_CONTENT);
-                String date = cursor.getString(COL_STORY_DATE);
-                String source = cursor.getString(COL_STORY_SOURCE);
-                String url = cursor.getString(COL_STORY_URL);
-                String bookmarked = cursor.getString(COL_STORY_BOOKMARKED);
-                String keywords = cursor.getString(COL_STORY_KEYWORDS);
-
-                Story story = new Story(title, content, date, source, url, bookmarked, keywords);
-                mStories.add(story);
-            }
-            Log.v("LOG_TAG", "mStories in OLF: " + mStories);
-        }
-
-
-        mStoryAdapter.swapCursor(cursor);
-
-//        updateEmptyView(0;
-        if( cursor.getCount() == 0) {
-            getActivity().supportStartPostponedEnterTransition();
-
-        } else {
-            //loop through existing stories
-        }
-    }
 
     @Override
     public void onDestroy() {
@@ -252,9 +159,6 @@ public class CardFragment extends Fragment implements LoaderManager.LoaderCallba
             mCardRecyclerView.clearOnScrollListeners();
         }
     }
-
-    @Override
-    public void onLoaderReset(Loader<Cursor> loader) {mStoryAdapter.swapCursor(null);}
 
     public void openNewCardDialog() {
         DialogFragment newCardDialog = new KeywordsEntryDialog();

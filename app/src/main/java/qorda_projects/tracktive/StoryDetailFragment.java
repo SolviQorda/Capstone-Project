@@ -38,7 +38,8 @@ public class StoryDetailFragment extends Fragment implements LoaderManager.Loade
             CardsContract.CardEntry.COLUMN_DATE,
             CardsContract.CardEntry.COLUMN_SOURCE,
             CardsContract.CardEntry.COLUMN_BOOKMARKED,
-            CardsContract.CardEntry.COLUMN_URL
+            CardsContract.CardEntry.COLUMN_URL,
+            CardsContract.CardEntry.COLUMN_TAB_NUMBER
     };
 
     private static int COL_STORY_ID = 0;
@@ -48,6 +49,7 @@ public class StoryDetailFragment extends Fragment implements LoaderManager.Loade
     private static int COL_STORY_SOURCE = 4;
     private static int COL_STORY_BOOKMARKED = 5;
     private static int COL_STORY_URL = 6;
+    private static int COL_STORY_TAB_NUMBER = 7;
 
     private TextView mTitleView;
     private TextView mContentView;
@@ -105,6 +107,7 @@ public class StoryDetailFragment extends Fragment implements LoaderManager.Loade
             String source = data.getString(COL_STORY_SOURCE);
             String date = data.getString(COL_STORY_DATE);
             mBookmarked = data.getString(COL_STORY_BOOKMARKED);
+            int tabNumber = data.getInt(COL_STORY_TAB_NUMBER);
 
             mTitleView.setText(title);
             mContentView.setText(content);

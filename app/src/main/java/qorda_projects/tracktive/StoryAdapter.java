@@ -1,7 +1,6 @@
 package qorda_projects.tracktive;
 
 import android.content.Context;
-import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -9,6 +8,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
+
+import java.util.ArrayList;
 
 import qorda_projects.tracktive.sync.ItemChoiceManager;
 
@@ -24,8 +25,8 @@ public class StoryAdapter extends RecyclerView.Adapter<StoryAdapter.StoryAdapter
     final private StoryAdapterOnClickHandler mOnClickHandler;
     final private View mEmptyView;
 
-    private Cursor mCursor;
     final private Context mContext;
+    private ArrayList<Story> mStories;
     final private ItemChoiceManager mICM;
 
 
@@ -51,7 +52,6 @@ public class StoryAdapter extends RecyclerView.Adapter<StoryAdapter.StoryAdapter
         @Override
         public void onClick(View v) {
             int adapterPosition = getAdapterPosition();
-            mCursor.moveToPosition(adapterPosition);
             mOnClickHandler.onClick(this);
             mICM.onClick(this);
         }
@@ -62,11 +62,11 @@ public class StoryAdapter extends RecyclerView.Adapter<StoryAdapter.StoryAdapter
         void onClick(StoryAdapterViewHolder viewHolder);
     }
 
-    public StoryAdapter(Context context, StoryAdapterOnClickHandler onClickHandler, View emptyView, int choiceMode) {
+    public StoryAdapter(Context context, StoryAdapterOnClickHandler onClickHandler, View emptyView, int choiceMode, ArrayList<Story> stories) {
         mContext = context;
         mOnClickHandler = onClickHandler;
         mEmptyView = emptyView;
-
+        mStories = stories;
         mICM = new ItemChoiceManager(this);
         mICM.setChoiceMode(choiceMode);
     }
@@ -87,18 +87,18 @@ public class StoryAdapter extends RecyclerView.Adapter<StoryAdapter.StoryAdapter
     @Override
     public void onBindViewHolder (StoryAdapterViewHolder storyAdapterViewHolder, int position) {
 
-        mCursor.moveToPosition(position);
+        Story story = mStories.get(position);
 
-        String title = mCursor.getString(CardFragment.COL_STORY_TITLE);
+        String title = story.getTitle();
         storyAdapterViewHolder.mTitleView.setText(title);
 
-        String source = mCursor.getString(CardFragment.COL_STORY_SOURCE);
+        String source = story.getSource();
         storyAdapterViewHolder.mSourceView.setText(source);
 
-        String date = mCursor.getString(CardFragment.COL_STORY_DATE);
+        String date = story.getDate();
         storyAdapterViewHolder.mDateView.setText(date);
 
-        String bookmarked = mCursor.getString(CardFragment.COL_STORY_BOOKMARKED);
+        String bookmarked = story.getBookmarked();
         int drawableId = Utility.bookmarkedOrNot(bookmarked);
 
         storyAdapterViewHolder.mBookmarked.setImageDrawable(mContext.getDrawable(drawableId));
@@ -125,17 +125,17 @@ public class StoryAdapter extends RecyclerView.Adapter<StoryAdapter.StoryAdapter
 
     @Override
     public int getItemCount() {
-        if(null == mCursor) return 0;
-        return mCursor.getCount();
+        if(null == mStories) return 0;
+        return mStories.size();
     }
 
-    public void swapCursor (Cursor newCursor) {
-        mCursor = newCursor;
+    public void swapArrayList (ArrayList<Story> newArrayList) {
+        mStories = newArrayList;
         notifyDataSetChanged();
         mEmptyView.setVisibility(getItemCount() == 0 ? View.VISIBLE : View.GONE);
     }
 
-    public Cursor getCursor() {return mCursor;}
+    public ArrayList<Story> getStories() {return mStories;}
 
 
 }
