@@ -92,9 +92,9 @@ public class MainActivity extends AppCompatActivity implements KeywordsEntryDial
 
 
         //If no pre-existing data then need to open up the dialog.
-        ArrayList<Card> existingCardDetails = getExistingCardDetails(this);
+       mTitlesAndKeywords = getExistingCardDetails(this);
 
-        if (existingCardDetails == null) {
+        if (mTitlesAndKeywords == null) {
             mFragments = new ArrayList<CardFragment>();
             DialogFragment newCardDialog = new KeywordsEntryDialog();
             FragmentManager manager = this.getSupportFragmentManager();
@@ -124,8 +124,6 @@ public class MainActivity extends AppCompatActivity implements KeywordsEntryDial
 
         mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(mTabLayout));
         mTabLayout.setTabMode(TabLayout.MODE_SCROLLABLE);
-
-
 
 
         //cycle through card titles (for tabs).
@@ -187,14 +185,14 @@ if (mTitlesAndKeywords != null ) {
         });
 
 
-
-
-        if (existingCardDetails != null) {
+        if (mTitlesAndKeywords != null) {
 
             TracktiveSyncAdapter.initializeSyncAdapter(this);
 
             TracktiveSyncAdapter.syncImmediately(this);
         }
+
+
 
 
 
@@ -268,11 +266,11 @@ if (mTitlesAndKeywords != null ) {
             }
             if(mStories!= null) {
                 getCardFragments();
-                mPagerAdapter = new CardPagerAdapter(
-                        getSupportFragmentManager(), mFragments);
-                mViewPager.setAdapter(mPagerAdapter);
 
             }
+            mPagerAdapter = new CardPagerAdapter(
+                    getSupportFragmentManager(), mFragments);
+            mViewPager.setAdapter(mPagerAdapter);
 
             Log.v("LOG_TAG", "mStories in OLF: " + mStories);
         }

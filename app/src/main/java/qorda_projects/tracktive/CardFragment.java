@@ -58,7 +58,7 @@ public class CardFragment extends Fragment{
         Bundle b = this.getArguments();
         if(mStories == null) {
             if(b != null) {
-                b.getParcelableArrayList("cardStoriesArrayList");
+                mStories = b.getParcelableArrayList("cardStoriesArrayList");
                 Log.v(LOG_TAG, "mStories taken from SIS bundle " + mStories);
             }
         }
