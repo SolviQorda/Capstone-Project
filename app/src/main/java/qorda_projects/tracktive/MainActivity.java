@@ -152,21 +152,21 @@ if (mTitlesAndKeywords != null ) {
                 //need to deliver this to the card fragment, how do I set it?
 
                 mViewPager.setCurrentItem(tab.getPosition());
-                int tabNumber = tab.getPosition();
-                ArrayList<Story> storiesForFragment = new ArrayList<Story>();
-                for(int i = 0; i <mStories.size(); i++) {
-                    Story story = mStories.get(i);
-                    int storyTabNumber = story.getTabNumber();
-                    if(storyTabNumber == tabNumber) {
-                        storiesForFragment.add(story);
-                    }
-                    CardFragment cardFragment = mFragments.get(tabNumber);
-                    Bundle args = new Bundle();
-                    args.putParcelableArrayList("cardStoriesArrayList", storiesForFragment);
-                    cardFragment.setArguments(args);
+//                int tabNumber = tab.getPosition();
+//                ArrayList<Story> storiesForFragment = new ArrayList<Story>();
+//                for(int i = 0; i <mStories.size(); i++) {
+//                    Story story = mStories.get(i);
+//                    int storyTabNumber = story.getTabNumber();
+//                    if(storyTabNumber == tabNumber) {
+//                        storiesForFragment.add(story);
+//                    }
+//                    CardFragment cardFragment = mFragments.get(tabNumber);
+//                    Bundle args = new Bundle();
+//                    args.putParcelableArrayList("cardStoriesArrayList", storiesForFragment);
+//                    cardFragment.setArguments(args);
 
 
-                }
+//                }
                 //set cardFragment with bundle arrayList
 
 
@@ -268,8 +268,10 @@ if (mTitlesAndKeywords != null ) {
                 getCardFragments();
 
             }
-            mPagerAdapter = new CardPagerAdapter(
-                    getSupportFragmentManager(), mFragments);
+            if(mPagerAdapter == null) {
+                mPagerAdapter = new CardPagerAdapter(
+                        getSupportFragmentManager(), mFragments);
+            }
             mViewPager.setAdapter(mPagerAdapter);
 
             Log.v("LOG_TAG", "mStories in OLF: " + mStories);
@@ -297,8 +299,7 @@ if (mTitlesAndKeywords != null ) {
     public void addCard(ArrayList<Card> cardDetailsArrayList, Uri cardUri) {
 
         Bundle args = new Bundle();
-        args.putParcelable("cardUri", cardUri);
-        Log.v(LOG_TAG, "Card uri when added:" + cardUri);
+        getSupportLoaderManager().initLoader(0, null, this);
 
         mTabLayout = (TabLayout) findViewById(R.id.main_tabs);
         mViewPager = (ViewPager) findViewById(R.id.main_pager);
@@ -308,15 +309,10 @@ if (mTitlesAndKeywords != null ) {
 
         int cardPosition = mTabLayout.getSelectedTabPosition();
         Log.v(LOG_TAG, "cardPosition" + cardPosition);
-//        args.putInt("position", cardPosition + 1);
 
         mTitlesAndKeywords = cardDetailsArrayList;
 
-//        if (mTitleArrayList == null) {
-//            mTitleArrayList = new ArrayList<String>();
-//        }
-//
-        int newCardPosition = mFragments.size();
+        int newCardPosition = mTitlesAndKeywords.size() - 1;
         Log.v(LOG_TAG, "cardDetailsArrayList in AddCard is: " + mTitlesAndKeywords);
 
         Card card = mTitlesAndKeywords.get(newCardPosition);
@@ -324,20 +320,42 @@ if (mTitlesAndKeywords != null ) {
         String tabTitle = card.getTitle();
         Log.v(LOG_TAG, "new card Position for " + tabTitle + " is " + newCardPosition);
 
-        mPagerAdapter.notifyDataSetChanged();
-        mTabLayout.addTab(mTabLayout.newTab().setText(tabTitle), true);
-        mPagerAdapter.notifyDataSetChanged();
+        if(mPagerAdapter != null) {
+            mPagerAdapter.notifyDataSetChanged();
+        }
 
+        mTabLayout.addTab(mTabLayout.newTab().setText(tabTitle), true);
+        if(mPagerAdapter != null) {
+            mPagerAdapter.notifyDataSetChanged();
+
+        }
         CardFragment cardFragment = CardFragment.newInstance(tabTitle, cardKeywords);
+
+        //add mStories as an arrayList parcelable
+
+        ArrayList<Story> storiesForFragment = new ArrayList<Story>();
+        if (mStories!=null) {
+            for (int q = 0; q < mStories.size(); q++) {
+                Story story = mStories.get(q);
+                int storyTabNumber = story.getTabNumber();
+                if (storyTabNumber == newCardPosition) {
+                    storiesForFragment.add(story);
+                }
+            }
+        }
+        if(storiesForFragment!=null) {
+            args.putParcelableArrayList("cardStoriesArrayList", storiesForFragment);
+        }
 
         cardFragment.setArguments(args);
 
         mFragments.add(cardFragment);
 
-        mPagerAdapter.notifyDataSetChanged();
+        if(mPagerAdapter != null) {
+            mPagerAdapter.notifyDataSetChanged();
+            Log.v(LOG_TAG, "dataset notified of change");
 
-        getSupportLoaderManager().initLoader(0, null, this);
-
+        }
 
         Toast.makeText(this, "Card made successfully!", Toast.LENGTH_LONG).show();
     }

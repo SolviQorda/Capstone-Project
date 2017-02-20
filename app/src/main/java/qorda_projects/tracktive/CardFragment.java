@@ -60,6 +60,7 @@ public class CardFragment extends Fragment{
             if(b != null) {
                 mStories = b.getParcelableArrayList("cardStoriesArrayList");
                 Log.v(LOG_TAG, "mStories taken from SIS bundle " + mStories);
+
             }
         }
     }
@@ -96,6 +97,10 @@ public class CardFragment extends Fragment{
 
         if (savedInstanceState!= null) {
             mStoryAdapter.onRestoreInstanceState(savedInstanceState);
+        }
+
+        if(mStories != null) {
+            emptyView.setVisibility(View.INVISIBLE);
         }
 
         FabSpeedDial makeCardFab = (FabSpeedDial) rootView.findViewById(R.id.make_card_fab);

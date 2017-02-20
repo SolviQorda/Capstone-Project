@@ -240,7 +240,6 @@ public class TracktiveSyncAdapter extends AbstractThreadedSyncAdapter {
                 url = StoryObject.getString(ER_URL);
                 date = StoryObject.getString(ER_DATE);
                 tabNumber = mTabNumber;
-                Log.v(LOG_TAG, "tabNumber inside getStoriesDataFromJSON: " + tabNumber);
                 //TODO: pull this from sharedPrefs like above
                 String keywordsQuery = queryKeywords;
 

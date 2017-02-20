@@ -122,7 +122,6 @@ public class KeywordsEntryDialog extends DialogFragment {
                         }
                         titlesAndKeywords.add(newCardDetails);
 
-
                         //arraylist --> GSON
 
                         String titlesAndKeywordsJson = gson.toJson(titlesAndKeywords);
