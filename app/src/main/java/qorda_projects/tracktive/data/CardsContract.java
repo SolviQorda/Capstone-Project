@@ -55,8 +55,9 @@ public class CardsContract {
             return CONTENT_URI.buildUpon().appendPath(keywords).build();
         }
 
-        public static Uri buildSingleStoryUri(String storyId) {
-            return CONTENT_URI.buildUpon().appendPath(STORY).appendPath(storyId).build();
+        public static Uri buildSingleStoryUri(int storyId) {
+            String storyIdString = Integer.toString(storyId);
+            return CONTENT_URI.buildUpon().appendPath(storyIdString).build();
         }
 
         public static Uri buildBookmarkedStoriesUri(String keywords) {
@@ -69,7 +70,7 @@ public class CardsContract {
         }
 
         public static String getIdFromUri(Uri uri) {
-            String id = uri.getPathSegments().get(2);
+            String id = uri.getPathSegments().get(1);
             Log.v(LOG_TAG, "getidfromUri is: " + id);
             return id;
             }

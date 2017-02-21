@@ -32,9 +32,10 @@ import java.util.List;
 import qorda_projects.tracktive.data.CardsContract;
 import qorda_projects.tracktive.sync.TracktiveSyncAdapter;
 
-public class MainActivity extends AppCompatActivity implements KeywordsEntryDialog.keywordsDialogListener, LoaderManager.LoaderCallbacks<Cursor> {
+public class MainActivity extends AppCompatActivity implements KeywordsEntryDialog.keywordsDialogListener, LoaderManager.LoaderCallbacks<Cursor>, CardFragment.Callback {
 
     public final String DIALOG_TAG = "new card dialog";
+    public final String DETAIL_URI = "detailUri";
     private final String LOG_TAG = MainActivity.class.getSimpleName().toString();
     private ViewPager mViewPager;
     public PagerAdapter mPagerAdapter;
@@ -69,9 +70,7 @@ public class MainActivity extends AppCompatActivity implements KeywordsEntryDial
     static final int COL_STORY_URL = 7;
     static final int COL_STORY_TAB_NUMBER = 8;
 
-    public interface Callback {
-        public void onItemSelected(Uri movieUri);
-    }
+
 
 
 
@@ -189,7 +188,9 @@ if (mTitlesAndKeywords != null ) {
 
             TracktiveSyncAdapter.initializeSyncAdapter(this);
 
-            TracktiveSyncAdapter.syncImmediately(this);
+            if (mStories == null) {
+                TracktiveSyncAdapter.syncImmediately(this);
+            }
         }
 
 
@@ -260,8 +261,9 @@ if (mTitlesAndKeywords != null ) {
                 String bookmarked = cursor.getString(COL_STORY_BOOKMARKED);
                 String keywords = cursor.getString(COL_STORY_KEYWORDS);
                 int tabNumber = cursor.getInt(COL_STORY_TAB_NUMBER);
+                int dbId = cursor.getInt(COL_CARD_ID);
 
-                Story story = new Story(title, content, date, source, url, bookmarked, keywords, tabNumber);
+                Story story = new Story(title, content, date, source, url, bookmarked, keywords, tabNumber, dbId);
                 mStories.add(story);
             }
             if(mStories!= null) {
@@ -352,8 +354,9 @@ if (mTitlesAndKeywords != null ) {
         mFragments.add(cardFragment);
 
         if(mPagerAdapter != null) {
-            mPagerAdapter.notifyDataSetChanged();
-            Log.v(LOG_TAG, "dataset notified of change");
+            mPagerAdapter = new CardPagerAdapter(
+                    getSupportFragmentManager(), mFragments);
+            mViewPager.setAdapter(mPagerAdapter);
 
         }
 
@@ -442,6 +445,17 @@ if (mTitlesAndKeywords != null ) {
         Uri uriFromKeywords = CardsContract.CardEntry.buildSingleCardUri(keywords);
         Log.v("utility", "Uri From fragment in position " + position + " is " + uriFromKeywords);
         return uriFromKeywords;
+    }
+
+    @Override
+    public void onItemSelected(Uri singleStoryUri, StoryAdapter.StoryAdapterViewHolder vh){
+//        if (mTwoPane) {}
+//        else {
+
+        Log.v(LOG_TAG, "single story uri in MA: " + singleStoryUri);
+        Intent intent = new Intent(this, StoryDetailActivity.class)
+                .setData(singleStoryUri);
+        startActivity(intent);
     }
 
 

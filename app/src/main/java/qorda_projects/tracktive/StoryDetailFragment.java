@@ -29,6 +29,7 @@ public class StoryDetailFragment extends Fragment implements LoaderManager.Loade
     private final String DETAIL_URI = "detailUri";
     private static final int STORY_DETAIL_LOADER = 0;
     private String mBookmarked;
+    private Story mStory;
 
 
     private static final String[] STORY_DETAIL_COLUMNS = {
@@ -57,6 +58,7 @@ public class StoryDetailFragment extends Fragment implements LoaderManager.Loade
     private TextView mSourceView;
     private ImageButton mOpenBrowserButton;
     private ImageButton mBookmarkButton;
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {

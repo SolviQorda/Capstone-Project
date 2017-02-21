@@ -3,10 +3,6 @@ package qorda_projects.tracktive;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.google.android.gms.maps.internal.MapLifecycleDelegate;
-
-import static android.R.attr.data;
-
 /**
  * Created by sorengoard on 10/01/2017.
  */
@@ -21,8 +17,10 @@ public class Story implements Parcelable {
     private String mBookmarked;
     private String mKeywords;
     private int mTabNumber;
+    private int mDbId;
 
-    public Story(String title, String content, String date, String source, String url, String bookmarked, String keywords, int tabNumber) {
+
+    public Story(String title, String content, String date, String source, String url, String bookmarked, String keywords, int tabNumber, int dbId) {
         mTitle = title;
         mContent = content;
         mDate = date;
@@ -31,6 +29,7 @@ public class Story implements Parcelable {
         mBookmarked = bookmarked;
         mKeywords = keywords;
         mTabNumber = tabNumber;
+        mDbId = dbId;
     }
 
     public String getTitle() {
@@ -85,6 +84,14 @@ public class Story implements Parcelable {
 
     public void setTabNumber(int tabNumber) {this.mTabNumber = tabNumber;}
 
+    public int getDbId() {
+        return mDbId;
+    }
+
+    public void setDbId(int dbId) {
+        mDbId = dbId;
+    }
+
 
     //make this parcelable.
 
@@ -98,6 +105,7 @@ public class Story implements Parcelable {
         mBookmarked = in.readString();
         mKeywords = in.readString();
         mTabNumber = in.readInt();
+        mDbId = in.readInt();
     }
 
     @Override
@@ -115,6 +123,7 @@ public class Story implements Parcelable {
         dest.writeString(mBookmarked);
         dest.writeString(mKeywords);
         dest.writeInt(mTabNumber);
+        dest.writeInt(mDbId);
     }
 
     @SuppressWarnings("unused")

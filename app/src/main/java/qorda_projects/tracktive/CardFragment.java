@@ -19,6 +19,7 @@ import java.util.ArrayList;
 
 import io.github.yavski.fabspeeddial.FabSpeedDial;
 import io.github.yavski.fabspeeddial.SimpleMenuListenerAdapter;
+import qorda_projects.tracktive.data.CardsContract;
 
 import static android.util.Log.v;
 
@@ -42,6 +43,9 @@ public class CardFragment extends Fragment{
 
 
 
+    public interface Callback {
+        public void onItemSelected(Uri singleStoryUri, StoryAdapter.StoryAdapterViewHolder vh);
+    }
 
 
 
@@ -85,10 +89,12 @@ public class CardFragment extends Fragment{
 
         mStoryAdapter =  new StoryAdapter(getActivity(), new StoryAdapter.StoryAdapterOnClickHandler() {
             @Override
-            public void onClick(StoryAdapter.StoryAdapterViewHolder viewHolder) {
+            public void onClick(int dbId, StoryAdapter.StoryAdapterViewHolder viewHolder) {
+                Log.v(LOG_TAG, "onClick called in cardFragment");
 
+                Uri singleStoryUri = CardsContract.CardEntry.buildSingleStoryUri(dbId);
 
-//                ((Callback) getActivity()).onItemSelected();
+                ((Callback) getActivity()).onItemSelected(singleStoryUri, viewHolder);
 
             }
         }, emptyView, AbsListView.CHOICE_MODE_NONE, mStories);

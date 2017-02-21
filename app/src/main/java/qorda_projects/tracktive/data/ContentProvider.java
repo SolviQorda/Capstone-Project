@@ -28,11 +28,15 @@ public class ContentProvider extends android.content.ContentProvider {
 
     private static final SQLiteQueryBuilder sCardsByKeywordsQueryBuilder;
     private static final SQLiteQueryBuilder sDiaryByKeywordsBuilder;
+    private static final SQLiteQueryBuilder sStoryByIdBuilder;
 
     static { sCardsByKeywordsQueryBuilder = new SQLiteQueryBuilder();
         sCardsByKeywordsQueryBuilder.setTables(CardsContract.CardEntry.TABLE_NAME);
 
     }
+
+    static { sStoryByIdBuilder = new SQLiteQueryBuilder();
+        sStoryByIdBuilder.setTables(CardsContract.CardEntry.TABLE_NAME);}
     static { sDiaryByKeywordsBuilder = new SQLiteQueryBuilder();}
 
 
@@ -41,8 +45,8 @@ public class ContentProvider extends android.content.ContentProvider {
     private static final String sKeywordsForCardSetting =
             CardsContract.CardEntry.TABLE_NAME + "." + CardsContract.CardEntry.COLUMN_CARD_KEYWORDS + " = ? ";
 
-//    private static final String sIdForSingleSingleStorySetting =
-//            CardsContract.CardEntry.TABLE_NAME + "." + CardsContract.CardEntry._ID + " = ? ";
+    private static final String sIdForSingleSingleStorySetting =
+            CardsContract.CardEntry.TABLE_NAME + "." + CardsContract.CardEntry._ID + " = ? ";
 
     private static final String sDiaryForCardSetting =
             CardsContract.DiaryEntry.TABLE_NAME + "." + CardsContract.DiaryEntry.COLUMN_CARD_KEYWORDS + " = ? ";
@@ -75,23 +79,23 @@ public class ContentProvider extends android.content.ContentProvider {
 
     }
 
-//    private Cursor getSingleStorybyIdSetting(Uri uri, String[] projection, String sortOrder) {
-//
-//        String id = CardsContract.CardEntry.getIdFromUri(uri);
-//
-//        String[] selectionArgs;
-//        String selection = sIdForSingleSingleStorySetting;
-//
-//        selectionArgs = new String[]{id};
-//
-//        return sStoryByIdBuilder.query(mCardDbHelper.getReadableDatabase(),
-//            projection,
-//            selection,
-//            selectionArgs,
-//            null,
-//            null,
-//            sortOrder);
-//    }
+    private Cursor getSingleStorybyIdSetting(Uri uri, String[] projection, String sortOrder) {
+
+        String id = CardsContract.CardEntry.getIdFromUri(uri);
+
+        String[] selectionArgs;
+        String selection = sIdForSingleSingleStorySetting;
+
+        selectionArgs = new String[]{id};
+
+        return sStoryByIdBuilder.query(mCardDbHelper.getReadableDatabase(),
+            projection,
+            selection,
+            selectionArgs,
+            null,
+            null,
+            sortOrder);
+    }
 
     static UriMatcher buildUriMatcher() {
         final UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
@@ -99,9 +103,9 @@ public class ContentProvider extends android.content.ContentProvider {
 
         matcher.addURI(authority, CardsContract.PATH_CARDS, CARDS);
         //matcher for a single card based on keywords
-        matcher.addURI(authority, CardsContract.PATH_CARDS + "/*" , SINGLE_CARD);
+//        matcher.addURI(authority, CardsContract.PATH_CARDS + "/*" , SINGLE_CARD);
         //matcher for a single story
-        matcher.addURI(authority, CardsContract.PATH_CARDS + "/story" + "/*", SINGLE_STORY);
+        matcher.addURI(authority, CardsContract.PATH_CARDS + "/#", SINGLE_STORY);
         //matcher for bookmarked stories in a card
         matcher.addURI(authority, CardsContract.PATH_CARDS + "/bookmarks" + "/*", BOOKMARKED);
         // matcher for a diary based on keywords
@@ -188,12 +192,12 @@ public class ContentProvider extends android.content.ContentProvider {
                 retCursor = getCardStoriesByKeywordsSetting(uri, projection, sortOrder);
                 break;
             }
-//            case SINGLE_STORY:
-//                Log.v(LOG_TAG, "single story type called in query");
-//            {
-//                retCursor = getSingleStorybyIdSetting(uri, projection, sortOrder);
-//                break;
-//            }
+            case SINGLE_STORY:
+                Log.v(LOG_TAG, "single story type called in query");
+            {
+                retCursor = getSingleStorybyIdSetting(uri, projection, sortOrder);
+                break;
+            }
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
 
@@ -275,6 +279,9 @@ public class ContentProvider extends android.content.ContentProvider {
                 break;
             case DIARY:
                 rowsUpdated = sqlDb.update(CardsContract.DiaryEntry.TABLE_NAME, contentValues, selection, selectionArgs);
+                break;
+            case SINGLE_STORY:
+                rowsUpdated = sqlDb.update(CardsContract.CardEntry.TABLE_NAME, contentValues, selection, selectionArgs);
                 break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);

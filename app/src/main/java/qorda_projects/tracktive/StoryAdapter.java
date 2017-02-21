@@ -3,6 +3,7 @@ package qorda_projects.tracktive;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -45,21 +46,27 @@ public class StoryAdapter extends RecyclerView.Adapter<StoryAdapter.StoryAdapter
             mDateView = (TextView) view.findViewById(R.id.card_list_date);
             mSourceView = (TextView) view.findViewById(R.id.card_story_source);
             mBookmarked = (ImageButton) view.findViewById(R.id.list_item_bookmark_icon);
+            view.setOnClickListener(this);
         }
 
         //Handle onClick ic_add interface clickHandler
 
         @Override
         public void onClick(View v) {
-            int adapterPosition = getAdapterPosition();
-            mOnClickHandler.onClick(this);
+            int adapterPosition = getLayoutPosition();
+            Story story = mStories.get(adapterPosition);
+            int dbId = story.getDbId();
+            Log.v(LOG_TAG, "dbId of story clicked: " + dbId);
+            mOnClickHandler.onClick(dbId, this);
             mICM.onClick(this);
+            Log.v(LOG_TAG, "onClick called in storyadapter");
+
         }
 
     }
 
     public interface StoryAdapterOnClickHandler {
-        void onClick(StoryAdapterViewHolder viewHolder);
+        void onClick(int idPosition, StoryAdapterViewHolder viewHolder);
     }
 
     public StoryAdapter(Context context, StoryAdapterOnClickHandler onClickHandler, View emptyView, int choiceMode, ArrayList<Story> stories) {
