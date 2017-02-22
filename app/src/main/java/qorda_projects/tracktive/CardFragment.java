@@ -31,13 +31,8 @@ public class CardFragment extends Fragment{
 
     private static final String LOG_TAG = CardFragment.class.getSimpleName().toString();
     public final String DIALOG_TAG = "new card dialog";
-    static final String CARD_URI = "cardUri";
-    public static Uri mUri;
-    private Uri mCardSpecificUri;
-    public static int mCardPosition;
 
     private StoryAdapter mStoryAdapter;
-    private RecyclerView mCardRecyclerView;
     private int mChoiceMode;
     private ArrayList<Story> mStories;
 
@@ -166,9 +161,6 @@ public class CardFragment extends Fragment{
 //        Bundle args = new Bundle();
 //        args.putParcelable("localCardUri", mCardSpecificUri);
 //        onSaveInstanceState(args);
-        if(null != mCardRecyclerView) {
-            mCardRecyclerView.clearOnScrollListeners();
-        }
     }
 
     public void openNewCardDialog() {
