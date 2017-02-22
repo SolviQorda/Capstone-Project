@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.DialogFragment;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -71,11 +70,6 @@ public class MainActivity extends AppCompatActivity implements KeywordsEntryDial
     static final int COL_STORY_URL = 7;
     static final int COL_STORY_TAB_NUMBER = 8;
 
-
-
-
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -99,8 +93,6 @@ public class MainActivity extends AppCompatActivity implements KeywordsEntryDial
             FragmentManager manager = this.getSupportFragmentManager();
             newCardDialog.show(manager, DIALOG_TAG);
         }
-
-
 
         //handle whether to go to 2-pane mode or not here
 //        if (savedInstanceState == null) {
@@ -139,7 +131,6 @@ if (mTitlesAndKeywords != null ) {
 //                cardFragment.onCreateLoader(0, titlePosition);
     }
 
-
 }
 
         mTabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
@@ -162,22 +153,16 @@ if (mTitlesAndKeywords != null ) {
 //                    args.putParcelableArrayList("cardStoriesArrayList", storiesForFragment);
 //                    cardFragment.setArguments(args);
 
-
 //                }
                 //set cardFragment with bundle arrayList
 
-
             }
 
             @Override
-            public void onTabUnselected(TabLayout.Tab tab) {
-
-            }
+            public void onTabUnselected(TabLayout.Tab tab) {}
 
             @Override
-            public void onTabReselected(TabLayout.Tab tab) {
-
-            }
+            public void onTabReselected(TabLayout.Tab tab) {}
 
         });
 
@@ -190,10 +175,6 @@ if (mTitlesAndKeywords != null ) {
                 TracktiveSyncAdapter.syncImmediately(this);
             }
         }
-
-
-
-
 
     }
 
@@ -238,7 +219,6 @@ if (mTitlesAndKeywords != null ) {
                 null,
                 null,
                 sortOrder);
-
     }
 
     @Override
@@ -248,8 +228,8 @@ if (mTitlesAndKeywords != null ) {
         } else {
             mStories = new ArrayList<Story>();
         }
-        if(cursor!= null && cursor.moveToFirst()){
-            for(int i = 0;i < cursor.getCount();i++) {
+        if (cursor != null && cursor.moveToFirst()) {
+            for (int i = 0; i < cursor.getCount(); i++) {
                 cursor.moveToPosition(i);
                 String title = cursor.getString(COL_STORY_TITLE);
                 String content = cursor.getString(COL_STORY_CONTENT);
@@ -262,27 +242,25 @@ if (mTitlesAndKeywords != null ) {
                 int dbId = cursor.getInt(COL_CARD_ID);
 
                 Story story = new Story(title, content, date, source, url, bookmarked, keywords, tabNumber, dbId);
+                //TODO: don't update instance variable here
                 mStories.add(story);
             }
 
-            if(mPagerAdapter == null && mStories!= null) {
-                ArrayList<CardFragment> fragments = getCardFragments();
-
-                mPagerAdapter = new CardPagerAdapter(
-                        getSupportFragmentManager(), fragments);
-            }
-                mViewPager.setAdapter(mPagerAdapter);
+            if (mStories != null) {
+                ArrayList<Card> existingCards = getExistingCardDetails(this);
+                ArrayList<CardFragment> fragments = updateCardFragments(existingCards);
+                setPagerAdapter(fragments);
 
                 Log.v("LOG_TAG", "mStories in OLF: " + mStories);
-        }
-
+            }
 
 //        mStoryAdapter.swapCursor(cursor);
-        if( cursor.getCount() == 0) {
-            this.supportStartPostponedEnterTransition();
+            if (cursor.getCount() == 0) {
+                this.supportStartPostponedEnterTransition();
 
-        } else {
-            //loop through existing stories
+            } else {
+                //loop through existing stories
+            }
         }
     }
 
@@ -309,12 +287,12 @@ if (mTitlesAndKeywords != null ) {
         int cardPosition = mTabLayout.getSelectedTabPosition();
         Log.v(LOG_TAG, "cardPosition" + cardPosition);
 
-        mTitlesAndKeywords = cardDetailsArrayList;
+        cardDetailsArrayList = getExistingCardDetails(this);
 
         int newCardPosition = mTitlesAndKeywords.size() - 1;
-        Log.v(LOG_TAG, "cardDetailsArrayList in AddCard is: " + mTitlesAndKeywords);
+        Log.v(LOG_TAG, "cardDetailsArrayList in AddCard is: " + cardDetailsArrayList);
 
-        Card card = mTitlesAndKeywords.get(newCardPosition);
+        Card card = cardDetailsArrayList.get(newCardPosition);
         String cardKeywords = card.getKeywords();
         String tabTitle = card.getTitle();
         Log.v(LOG_TAG, "new card Position for " + tabTitle + " is " + newCardPosition);
@@ -329,29 +307,21 @@ if (mTitlesAndKeywords != null ) {
 
         }
 
-        //TODO: encapsulate this in a separate purer function. Surely if we just passed
-        CardFragment cardFragment = CardFragment.newInstance(tabTitle, cardKeywords);
+        ArrayList<CardFragment> fragments = updateCardFragments(cardDetailsArrayList);
+        setPagerAdapter(fragments);
 
-        //add mStories as an arrayList parcelable
+        //recreating the activity for the new card.
+        this.recreate();
 
-        ArrayList<Story> storiesForFragment = getStoriesForTabNumber(newCardPosition, mStories);
-
-        if(storiesForFragment!=null) {
-            args.putParcelableArrayList("cardStoriesArrayList", storiesForFragment);
-        }
-
-        cardFragment.setArguments(args);
-
-        mFragments.add(cardFragment);
-
-        if(mPagerAdapter != null) {
-            mPagerAdapter = new CardPagerAdapter(
-                    getSupportFragmentManager(), mFragments);
-            mViewPager.setAdapter(mPagerAdapter);
-
-        }
 
         Toast.makeText(this, "Card made successfully!", Toast.LENGTH_LONG).show();
+    }
+
+    public void setPagerAdapter(ArrayList<CardFragment> fragments) {
+            mPagerAdapter = new CardPagerAdapter(
+                    getSupportFragmentManager(), fragments);
+            mViewPager.setAdapter(mPagerAdapter);
+
     }
 
     @Override
@@ -370,7 +340,7 @@ if (mTitlesAndKeywords != null ) {
         return super.onOptionsItemSelected(item);
     }
 
-    private ArrayList<CardFragment> getCardFragments() {
+    private ArrayList<CardFragment> updateCardFragments(ArrayList<Card> cardDetails) {
         ArrayList<CardFragment> cardFragmentList = new ArrayList<CardFragment>();
 
         ArrayList<Card> titlesAndKeywords = getExistingCardDetails(this);
@@ -394,12 +364,9 @@ if (mTitlesAndKeywords != null ) {
                 CardFragment cardFragment = CardFragment.newInstance(cardTitle, cardKeywords);
                 cardFragment.setArguments(args);
                 cardFragmentList.add(cardFragment);
-
-
-                return cardFragmentList;
             }
         }
-
+        return cardFragmentList;
     }
 
     private ArrayList<Story> getStoriesForTabNumber(int tabNumber, ArrayList<Story> allStories) {
@@ -414,9 +381,7 @@ if (mTitlesAndKeywords != null ) {
             }
         }
         return storiesForFragment;
-
     }
-
 
     public static ArrayList<Card> getExistingCardDetails(Context context) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
