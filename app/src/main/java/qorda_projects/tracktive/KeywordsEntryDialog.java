@@ -35,8 +35,7 @@ public class KeywordsEntryDialog extends DialogFragment {
 
     public interface keywordsDialogListener {
 
-        public void addCard(ArrayList<Card> titlesAndKeywordsArrayList, Uri cardUri);
-
+        void initLoaderForNewCard();
     }
 
     public  EditText mCardTitle;
@@ -137,8 +136,7 @@ public class KeywordsEntryDialog extends DialogFragment {
                         Uri cardForKeywordUri = CardsContract.CardEntry.buildSingleCardUri(keywordsFromUser);
                         Log.v(LOG_TAG, "cards Uri:" + cardForKeywordUri);
 
-
-                        mListener.addCard(titlesAndKeywords, cardForKeywordUri);
+                        mListener.initLoaderForNewCard();
 
                     }
                 })

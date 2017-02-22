@@ -20,7 +20,6 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -38,7 +37,7 @@ public class MainActivity extends AppCompatActivity implements KeywordsEntryDial
     public final String DETAIL_URI = "detailUri";
     private final String LOG_TAG = MainActivity.class.getSimpleName().toString();
     private ViewPager mViewPager;
-    public PagerAdapter mPagerAdapter;
+    private PagerAdapter mPagerAdapter;
     private TabLayout mTabLayout;
     private SharedPreferences mSharedPreferences;
     private ArrayList<Card> mTitlesAndKeywords;
@@ -78,17 +77,13 @@ public class MainActivity extends AppCompatActivity implements KeywordsEntryDial
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.main_toolbar);
         setSupportActionBar(toolbar);
-        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-
-        mUri = CardsContract.CardEntry.CONTENT_URI;
 
         getSupportLoaderManager().initLoader(0, null, this);
 
         //If no pre-existing data then need to open up the dialog.
-       mTitlesAndKeywords = getExistingCardDetails(this);
+       ArrayList<Card> existingCardDetails = getExistingCardDetails(this);
 
-        if (mTitlesAndKeywords == null) {
-            mFragments = new ArrayList<CardFragment>();
+        if (existingCardDetails == null) {
             DialogFragment newCardDialog = new KeywordsEntryDialog();
             FragmentManager manager = this.getSupportFragmentManager();
             newCardDialog.show(manager, DIALOG_TAG);
@@ -108,38 +103,28 @@ public class MainActivity extends AppCompatActivity implements KeywordsEntryDial
 //        CardFragment cardFragment = ((CardFragment) getSupportFragmentManager()
 //                .findFragmentById(R.id.stories_fragment));
 
+        TabLayout tabLayout = getTabLayout();
+        final ViewPager viewPager = getViewPager();
 
-        mTabLayout = (TabLayout) findViewById(R.id.main_tabs);
-
-        mViewPager = (ViewPager) findViewById(R.id.main_pager);
-
-        mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(mTabLayout));
-        mTabLayout.setTabMode(TabLayout.MODE_SCROLLABLE);
-
+        viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
+        tabLayout.setTabMode(TabLayout.MODE_SCROLLABLE);
 
         //cycle through card titles (for tabs).
 
-if (mTitlesAndKeywords != null ) {
-    for (int i = 0; i < mTitlesAndKeywords.size(); i++) {
-        Card card = mTitlesAndKeywords.get(i);
+if (existingCardDetails != null ) {
+    for (int i = 0; i < existingCardDetails.size(); i++) {
+        Card card = existingCardDetails.get(i);
         String tabTitle = card.getTitle();
-        mTabLayout.addTab(mTabLayout.newTab().setText(tabTitle));
-        mTabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
-        mTabLayout.setContentDescription(tabTitle);
-
-//        Log.v(LOG_TAG, "bundle: " + titlePosition);
-//                cardFragment.onCreateLoader(0, titlePosition);
+        addTab(tabTitle);
     }
-
 }
-
-        mTabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+        tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
 
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 //need to deliver this to the card fragment, how do I set it?
 
-                mViewPager.setCurrentItem(tab.getPosition());
+                viewPager.setCurrentItem(tab.getPosition());
 //                int tabNumber = tab.getPosition();
 //                ArrayList<Story> storiesForFragment = new ArrayList<Story>();
 //                for(int i = 0; i <mStories.size(); i++) {
@@ -155,7 +140,6 @@ if (mTitlesAndKeywords != null ) {
 
 //                }
                 //set cardFragment with bundle arrayList
-
             }
 
             @Override
@@ -166,14 +150,11 @@ if (mTitlesAndKeywords != null ) {
 
         });
 
-
-        if (mTitlesAndKeywords != null) {
+        if (existingCardDetails != null) {
 
             TracktiveSyncAdapter.initializeSyncAdapter(this);
 
-            if (mStories == null) {
-                TracktiveSyncAdapter.syncImmediately(this);
-            }
+
         }
 
     }
@@ -213,8 +194,9 @@ if (mTitlesAndKeywords != null ) {
     @Override
     public Loader<Cursor> onCreateLoader(int it, Bundle bundle) {
         String sortOrder = CardsContract.CardEntry.COLUMN_DATE+ " ASC";
+        Uri uri = CardsContract.CardEntry.CONTENT_URI;
         return new CursorLoader(this,
-                mUri,
+                uri,
                 STORY_COLUMNS,
                 null,
                 null,
@@ -223,11 +205,8 @@ if (mTitlesAndKeywords != null ) {
 
     @Override
     public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
-        if (mStories != null) {
-            mStories.clear();
-        } else {
-            mStories = new ArrayList<Story>();
-        }
+        ArrayList<Story> stories = new ArrayList<Story>();
+
         if (cursor != null && cursor.moveToFirst()) {
             for (int i = 0; i < cursor.getCount(); i++) {
                 cursor.moveToPosition(i);
@@ -243,15 +222,19 @@ if (mTitlesAndKeywords != null ) {
 
                 Story story = new Story(title, content, date, source, url, bookmarked, keywords, tabNumber, dbId);
                 //TODO: don't update instance variable here
-                mStories.add(story);
+                stories.add(story);
             }
 
-            if (mStories != null) {
+            if (stories != null) {
                 ArrayList<Card> existingCards = getExistingCardDetails(this);
-                ArrayList<CardFragment> fragments = updateCardFragments(existingCards);
+                ArrayList<CardFragment> fragments = updateCardFragments(existingCards, stories);
                 setPagerAdapter(fragments);
 
-                Log.v("LOG_TAG", "mStories in OLF: " + mStories);
+                Log.v("LOG_TAG", "mStories in OLF: " + stories);
+            }
+
+            if (stories == null) {
+                TracktiveSyncAdapter.syncImmediately(this);
             }
 
 //        mStoryAdapter.swapCursor(cursor);
@@ -264,64 +247,45 @@ if (mTitlesAndKeywords != null ) {
         }
     }
 
-
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
 //        mStoryAdapter.swapCursor(null);
     }
 
+    public void initLoaderForNewCard() {
 
-
-
-    public void addCard(ArrayList<Card> cardDetailsArrayList, Uri cardUri) {
-
-        Bundle args = new Bundle();
         getSupportLoaderManager().initLoader(0, null, this);
-
-        mTabLayout = (TabLayout) findViewById(R.id.main_tabs);
-        mViewPager = (ViewPager) findViewById(R.id.main_pager);
-
-        mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(mTabLayout));
-        mTabLayout.setTabMode(TabLayout.MODE_SCROLLABLE);
-
-        int cardPosition = mTabLayout.getSelectedTabPosition();
-        Log.v(LOG_TAG, "cardPosition" + cardPosition);
-
-        cardDetailsArrayList = getExistingCardDetails(this);
-
-        int newCardPosition = mTitlesAndKeywords.size() - 1;
-        Log.v(LOG_TAG, "cardDetailsArrayList in AddCard is: " + cardDetailsArrayList);
-
-        Card card = cardDetailsArrayList.get(newCardPosition);
-        String cardKeywords = card.getKeywords();
-        String tabTitle = card.getTitle();
-        Log.v(LOG_TAG, "new card Position for " + tabTitle + " is " + newCardPosition);
-
-        if(mPagerAdapter != null) {
-            mPagerAdapter.notifyDataSetChanged();
-        }
-
-        mTabLayout.addTab(mTabLayout.newTab().setText(tabTitle), true);
-        if(mPagerAdapter != null) {
-            mPagerAdapter.notifyDataSetChanged();
-
-        }
-
-        ArrayList<CardFragment> fragments = updateCardFragments(cardDetailsArrayList);
-        setPagerAdapter(fragments);
-
         //recreating the activity for the new card.
         this.recreate();
-
-
-        Toast.makeText(this, "Card made successfully!", Toast.LENGTH_LONG).show();
     }
 
-    public void setPagerAdapter(ArrayList<CardFragment> fragments) {
-            mPagerAdapter = new CardPagerAdapter(
+    private void setPagerAdapter(ArrayList<CardFragment> fragments) {
+        ViewPager viewPager = (ViewPager) findViewById(R.id.main_pager);
+        PagerAdapter pagerAdapter = new CardPagerAdapter(
                     getSupportFragmentManager(), fragments);
-            mViewPager.setAdapter(mPagerAdapter);
+            viewPager.setAdapter(pagerAdapter);
 
+    }
+
+    private void addTab(String title) {
+        TabLayout tabLayout = getTabLayout();
+        tabLayout.addTab(tabLayout.newTab().setText(title), true);
+        ViewPager viewPager = getViewPager();
+        viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
+        tabLayout.setTabMode(TabLayout.MODE_SCROLLABLE);
+        tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
+        tabLayout.setContentDescription(title);
+
+    }
+
+    private TabLayout getTabLayout() {
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.main_tabs);
+        return tabLayout;
+    }
+
+    private ViewPager getViewPager() {
+        ViewPager viewPager = (ViewPager) findViewById(R.id.main_pager);
+        return viewPager;
     }
 
     @Override
@@ -340,22 +304,21 @@ if (mTitlesAndKeywords != null ) {
         return super.onOptionsItemSelected(item);
     }
 
-    private ArrayList<CardFragment> updateCardFragments(ArrayList<Card> cardDetails) {
+    private ArrayList<CardFragment> updateCardFragments(ArrayList<Card> cardDetails, ArrayList<Story> stories) {
         ArrayList<CardFragment> cardFragmentList = new ArrayList<CardFragment>();
 
-        ArrayList<Card> titlesAndKeywords = getExistingCardDetails(this);
-        if (titlesAndKeywords != null) {
-            Log.v(LOG_TAG, "cardDetailsArray contains: " + titlesAndKeywords);
-            for (int i = 0; i < titlesAndKeywords.size(); i++) {
-                Card card = titlesAndKeywords.get(i);
+        if (cardDetails != null) {
+            Log.v(LOG_TAG, "cardDetailsArray contains: " + cardDetails);
+            for (int i = 0; i < cardDetails.size(); i++) {
+                Card card = cardDetails.get(i);
                 String cardTitle = card.getTitle();
-                //refactor into
                 String cardKeywords = card.getKeywords();
                 Log.v(LOG_TAG, "at position " + i + " cardTitle: " + cardTitle);
+                //add tab
+                addTab(cardTitle);
                 // get relevant story data
-                 Bundle args  = new Bundle();
-
-                ArrayList<Story> storiesForFragment = getStoriesForTabNumber(i, mStories);
+                Bundle args  = new Bundle();
+                ArrayList<Story> storiesForFragment = getStoriesForTabNumber(i, stories);
 
                 if(storiesForFragment!=null) {
                     args.putParcelableArrayList("cardStoriesArrayList", storiesForFragment);
