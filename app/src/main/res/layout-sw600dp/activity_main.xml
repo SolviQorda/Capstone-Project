@@ -36,12 +36,22 @@
 
     </android.support.v7.widget.Toolbar>
 
+    <android.support.v4.widget.Space
+        android:id="@+id/layout_center"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_centerInParent="true"/>
+
 
     <android.support.design.widget.TabLayout
         android:id="@+id/main_tabs"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_below="@+id/main_toolbar"
+        android:layout_alignEnd="@+id/layout_center"
+        android:layout_alignRight="@+id/layout_center"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
         android:background="@color/colorPrimary"
         android:elevation="@dimen/toolbar_elevation"
         android:minHeight="?attr/actionBarSize"
@@ -50,7 +60,11 @@
     <android.support.v4.view.ViewPager
         android:id="@+id/main_pager"
         android:layout_height="fill_parent"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
+        android:layout_alignEnd="@+id/layout_center"
+        android:layout_alignRight="@+id/layout_center"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
         android:layout_below="@+id/main_tabs">
 
         <fragment
@@ -64,11 +78,30 @@
 
     </android.support.v4.view.ViewPager>
 
+    <android.support.v4.widget.Space
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/cardviewAligner"
+        android:layout_alignLeft="@id/layout_center"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginTop="?attr/actionBarSize"
+        android:layout_marginEnd="@dimen/list_item_padding"
+        android:layout_marginRight="@dimen/list_item_padding"
+        android:layout_alignStart="@id/layout_center"
+        android:elevation="@dimen/cardview_default_elevation"/>.
+
 
     <FrameLayout
-android:id="@+id/movie_detail_container"
+android:id="@+id/story_detail_container"
 android:layout_width="0dp"
 android:layout_height="match_parent"
-android:layout_weight="4"/>
+android:layout_alignLeft="@+id/cardviewAligner"
+android:layout_alignRight="@+id/cardviewAligner"
+android:layout_alignEnd="@id/cardviewAligner"
+android:layout_alignBottom="@+id/cardviewAligner"
+android:layout_alignTop="@+id/cardviewAligner"
+android:layout_marginTop="@dimen/two_pane_story_top_margin"
+/>
 
     </RelativeLayout>

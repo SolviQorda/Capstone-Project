@@ -116,6 +116,15 @@ public class StoryDetailFragment extends Fragment implements LoaderManager.Loade
             mSourceView.setText(source);
             mDateView.setText(date);
 
+            mOpenBrowserButton.setContentDescription(getResources().getString(R.string.open_story_in_browser));
+
+            if(mBookmarked.equals("0")) {
+                mBookmarkButton.setContentDescription(getResources().getString(R.string.add_to_bookmarks));
+            } else if (mBookmarked.equals("1")) {
+                mBookmarkButton.setContentDescription(getResources().getString(R.string.remove_from_bookmarks));
+            }
+
+
             mBookmarkButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -132,6 +141,7 @@ public class StoryDetailFragment extends Fragment implements LoaderManager.Loade
                         getContext().getContentResolver().update(mUri, bookmarkValue, mSelectectionClause, selectionArgs);
                         mBookmarkButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_bookmark_green));
                         Toast.makeText(getContext(), getResources().getString(R.string.story_detail_added_to_bookmarks), Toast.LENGTH_SHORT).show();
+
                         mBookmarked = "1";
                         bookmarkValue.clear();
 

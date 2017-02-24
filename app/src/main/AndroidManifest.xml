@@ -72,6 +72,23 @@
                 android:resource="@xml/syncadapter"/>
         </service>
 
+        <!-- widget receiver -->
+        <receiver android:name=".widget.CardWidgetProvider"
+                  android:label="@string/widget_description"
+                  android:enabled="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+                <action android:name="com.qorda_projects.tracktive.app.ACTION_DATA_UPDATES"/>
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider"
+                       android:resource="@xml/app_widget_provider_info"/>
+        </receiver>
+
+        <service android:name=".widget.CardWidgetRemoteViewsService"
+                 android:enabled="true"
+                 android:exported="false"
+                 android:permission="android.permission.BIND_REMOTEVIEWS"/>
+
     </application>
 
 

@@ -31,6 +31,7 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:paddingRight="@dimen/activity_horizontal_margin"
+            android:paddingEnd="@dimen/activity_horizontal_margin"
             android:textAppearance="@style/Base.TextAppearance.AppCompat.Menu"
             android:textStyle="italic"
             android:text="@string/story_default_source"/>
@@ -55,7 +56,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:gravity="bottom|left">
+        android:gravity="bottom|right">
 
         <ImageButton
             android:id="@+id/story_detail_bookmark_icon"

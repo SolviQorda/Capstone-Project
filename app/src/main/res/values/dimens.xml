@@ -6,6 +6,7 @@
     <dimen name="button_icon_diameter">48dp</dimen>
     <dimen name="list_item_padding">4dp</dimen>
     <dimen name="toolbar_elevation">8dp</dimen>
+    <dimen name="list_item_size">80dp</dimen>
 
     <dimen name="diary_list_title">18sp</dimen>
     <dimen name="dialog_title_height">64dp</dimen>
@@ -19,5 +20,11 @@
     <!--widget-->
     <dimen name="widget_margin">8dp</dimen>
     <dimen name="widget_padding">6dp</dimen>
+    <dimen name = "widget_default_height">40dp</dimen>
+    <dimen name="widget_default_width">120dp</dimen>
+    <dimen name="widget_default_resize_height">40dp</dimen>
+    <dimen name="widget_default_resize_width">40dp</dimen>
+
+    <dimen name="two_pane_story_top_margin">40dp</dimen>
 
 </resources>
