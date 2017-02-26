@@ -20,64 +20,16 @@ public class ContentProvider extends android.content.ContentProvider {
     private static final String LOG_TAG = ContentProvider.class.getSimpleName().toString();
 
     static final int CARDS = 100;
-    static final int SINGLE_CARD = 101;
     static final int SINGLE_STORY = 102;
-    static final int BOOKMARKED = 103;
-    static final int DIARY = 200;
-    static final int SINGLE_ENTRY = 201;
 
-    private static final SQLiteQueryBuilder sCardsByKeywordsQueryBuilder;
-    private static final SQLiteQueryBuilder sDiaryByKeywordsBuilder;
     private static final SQLiteQueryBuilder sStoryByIdBuilder;
-
-    static { sCardsByKeywordsQueryBuilder = new SQLiteQueryBuilder();
-        sCardsByKeywordsQueryBuilder.setTables(CardsContract.CardEntry.TABLE_NAME);
-
-    }
 
     static { sStoryByIdBuilder = new SQLiteQueryBuilder();
         sStoryByIdBuilder.setTables(CardsContract.CardEntry.TABLE_NAME);}
-    static { sDiaryByKeywordsBuilder = new SQLiteQueryBuilder();}
-
-
-
-    //keywords = ?
-    private static final String sKeywordsForCardSetting =
-            CardsContract.CardEntry.TABLE_NAME + "." + CardsContract.CardEntry.COLUMN_CARD_KEYWORDS + " = ? ";
 
     private static final String sIdForSingleSingleStorySetting =
             CardsContract.CardEntry.TABLE_NAME + "." + CardsContract.CardEntry._ID + " = ? ";
 
-    private static final String sDiaryForCardSetting =
-            CardsContract.DiaryEntry.TABLE_NAME + "." + CardsContract.DiaryEntry.COLUMN_CARD_KEYWORDS + " = ? ";
-
-    private static final String sSingleDiaryEntrySetting =
-            CardsContract.DiaryEntry.TABLE_NAME + "." + CardsContract.DiaryEntry._ID + " = ? ";
-
-
-
-    private Cursor getCardStoriesByKeywordsSetting(Uri uri, String[] projection, String sortOrder) {
-        // Get keywords from card title corresponding to current card.
-        String cardsSetting = CardsContract.CardEntry.getKeywordsFromUri(uri);
-        Log.v(LOG_TAG, "keywords from cardsetting CP: " + cardsSetting);
-
-        String[] selectionArgs;
-
-        String selection = sKeywordsForCardSetting;
-
-        //TODO: this is coming from a an array list (or a string?) so we need to make sure it ends up as an array
-
-        selectionArgs = new String[]{cardsSetting};
-
-        return sCardsByKeywordsQueryBuilder.query(mCardDbHelper.getReadableDatabase(),
-                projection,
-                selection,
-                selectionArgs,
-                null,
-                null,
-                sortOrder);
-
-    }
 
     private Cursor getSingleStorybyIdSetting(Uri uri, String[] projection, String sortOrder) {
 
@@ -102,16 +54,8 @@ public class ContentProvider extends android.content.ContentProvider {
         final String authority = CardsContract.CONTENT_AUTHORITY;
 
         matcher.addURI(authority, CardsContract.PATH_CARDS, CARDS);
-        //matcher for a single card based on keywords
-//        matcher.addURI(authority, CardsContract.PATH_CARDS + "/*" , SINGLE_CARD);
         //matcher for a single story
         matcher.addURI(authority, CardsContract.PATH_CARDS + "/#", SINGLE_STORY);
-        //matcher for bookmarked stories in a card
-        matcher.addURI(authority, CardsContract.PATH_CARDS + "/bookmarks" + "/*", BOOKMARKED);
-        // matcher for a diary based on keywords
-        matcher.addURI(authority, CardsContract.PATH_DIARY + "/*", DIARY);
-        //matcher for diary entry based on id
-        matcher.addURI(authority, CardsContract.PATH_DIARY + "/entry" + "/*", SINGLE_ENTRY);
 
         //TODO: add other cases, eg diary
 
@@ -134,35 +78,14 @@ public class ContentProvider extends android.content.ContentProvider {
             case CARDS:
                 Log.v(LOG_TAG, "multiple cards card type called in GetType");
                 return CardsContract.CardEntry.CONTENT_TYPE;
-            case SINGLE_CARD:
-                Log.v(LOG_TAG, "single card type called in GetType");
-                return CardsContract.CardEntry.CONTENT_TYPE;
             case SINGLE_STORY:
                 Log.v(LOG_TAG, "single story type called in GetType");
                 return CardsContract.CardEntry.CONTENT_ITEM_TYPE;
-            case BOOKMARKED:
-                Log.v(LOG_TAG, "bookmarked type called in GetType");
-                return CardsContract.CardEntry.CONTENT_TYPE;
-            case DIARY:
-                Log.v(LOG_TAG, "diary type called in GetType");
-                return CardsContract.DiaryEntry.CONTENT_TYPE;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
     }
 
-//    private Cursor getDiaryByCardKeyword(Uri uri, String[] projection, String sortOrder) {
-//        String diaryEntrySetting = CardsContract.DiaryEntry.getDiaryKeywordsFromUri(uri);
-//        String[] selectionArgs = new String[]{diaryEntrySetting};
-//        return sDiaryByKeywordsBuilder.query(mCardDbHelper.getReadableDatabase(),
-//                projection,
-//                sDiaryForCardSetting,
-//                selectionArgs,
-//                null,
-//                null,
-//                sortOrder
-//                );
-//        }
 
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
@@ -183,13 +106,6 @@ public class ContentProvider extends android.content.ContentProvider {
                         null,
                         sortOrder
                 );
-                break;
-            }
-            case SINGLE_CARD:
-                Log.v(LOG_TAG, "single cards card type called in query");
-
-            {
-                retCursor = getCardStoriesByKeywordsSetting(uri, projection, sortOrder);
                 break;
             }
             case SINGLE_STORY:
@@ -223,14 +139,6 @@ public class ContentProvider extends android.content.ContentProvider {
                 break;
                 //TODO: diary case
             }
-            case DIARY: {
-                long _id = sqlDb.insert(CardsContract.DiaryEntry.TABLE_NAME, null, values);
-                if (_id > 0)
-                    returnUri = CardsContract.DiaryEntry.buildDiaryUri(_id);
-                else
-                    throw new android.database.SQLException("failed to insert row into " + uri);
-                break;
-            }
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -251,11 +159,10 @@ public class ContentProvider extends android.content.ContentProvider {
                 rowsDeleted = sqlDb.delete(
                         CardsContract.CardEntry.TABLE_NAME, selection, selectionArgs);
                 break;
-            case DIARY:
+            case SINGLE_STORY:
                 rowsDeleted = sqlDb.delete(
-                        CardsContract.DiaryEntry.TABLE_NAME, selection, selectionArgs);
+                        CardsContract.CardEntry.TABLE_NAME, selection, selectionArgs);
                 break;
-
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -276,9 +183,6 @@ public class ContentProvider extends android.content.ContentProvider {
         switch (match) {
             case CARDS:
                 rowsUpdated = sqlDb.update(CardsContract.CardEntry.TABLE_NAME, contentValues, selection, selectionArgs);
-                break;
-            case DIARY:
-                rowsUpdated = sqlDb.update(CardsContract.DiaryEntry.TABLE_NAME, contentValues, selection, selectionArgs);
                 break;
             case SINGLE_STORY:
                 rowsUpdated = sqlDb.update(CardsContract.CardEntry.TABLE_NAME, contentValues, selection, selectionArgs);

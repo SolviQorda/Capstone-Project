@@ -2,7 +2,7 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:orientation="vertical"
               android:layout_width="match_parent"
-              android:layout_height="wrap_content">
+             android:layout_height="wrap_content">
 
     <LinearLayout
             android:id="@+id/list_item_text_holder"
@@ -16,12 +16,12 @@
            android:layout_height="match_parent"
            android:textStyle="bold"
            android:textAppearance="@style/Base.TextAppearance.AppCompat.Title"
-           android:text="sth happened the other day that wasnt so great"
+           android:text="@string/story_default_title"
             android:paddingBottom="@dimen/list_item_padding"/>
 
         <LinearLayout
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:orientation="horizontal">
             <TextView
                 android:id="@+id/card_story_source"
@@ -29,20 +29,21 @@
                 android:layout_height="match_parent"
                 android:layout_marginRight="@dimen/activity_horizontal_margin"
                 android:layout_marginEnd="@dimen/activity_horizontal_margin"
-                android:text="The BS Merchant"
+                android:text="@string/story_default_source"
             />
 
             <TextView
                 android:id="@+id/card_list_date"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="13 - 04 -2017"/>
+                android:text="@string/story_default_date"/>
 
         </LinearLayout>
 
 
+
     </LinearLayout>
-    <ImageButton
+    <ImageView
         android:id="@+id/list_item_bookmark_icon"
         android:scaleType="fitXY"
         android:layout_width="@dimen/button_icon_diameter"
@@ -51,6 +52,7 @@
         android:paddingRight="@dimen/activity_vertical_margin"
         android:paddingEnd="@dimen/activity_vertical_margin"
         android:src="@drawable/ic_bookmark_black_48dp"/>
+
 
 
 </FrameLayout>

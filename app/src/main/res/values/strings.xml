@@ -1,9 +1,13 @@
 <resources>
     <string name="app_name">Tracktive</string>
-    <string name="content_authority">qorda_projects.tracktive.app</string>
-    <string name="sync_account_type">tracktive.qorda_projects.com</string>
+    <string name="content_authority" translatable="false">qorda_projects.tracktive.app</string>
+    <string name="sync_account_type" translatable="false">tracktive.qorda_projects.com</string>
     <string name="diary_view">Diary View</string>
-    <string name="options_fab">New Card, new diary entry and view diaries,</string>
+    <string name="options_fab">New Card, delete all cards</string>
+    <string name="delete_all_cards">Delete all cards</string>
+    <string name="delete_confirmation">Are you sure you want to delete all data?</string>
+    <string name="delete">Delete</string>
+    <string name="data_deleted">All data deleted</string>
 
     <!-- NEW CARD DIALOG -->
     <string name="build_new_card">Build a New Card</string>
@@ -19,17 +23,10 @@
 
     <string name="empty_story_list">No story information available, check your connection</string>
 
-    <string name="adUnitId">ca-app-pub-3940256099942544/6300978111</string>
+    <string name="adUnitId" translatable="false">ca-app-pub-3940256099942544/6300978111</string>
 
     <string name="action_settings">Settings</string>
 
-    <!--DIARY ENTRY-->
-    <string name="diary_entry">Diary entry</string>
-    <string name="new_diary_entry">New Diary Entry</string>
-    <string name="date_placeholder">30th February 2140</string>
-    <string name="diary_dialog_title_entry">Title</string>
-    <string name="diary_dialog_body_entry">What are you thinking?</string>
-    <string name="save_diary_entry">Save entry</string>
 
     <!--SHARED PREFERENCES -->
     <string name="pref_keywords_key" translatable="false">keywords-json-string</string>
@@ -48,5 +45,17 @@
     <string name="story_default_date">7-11-17</string>
     <string name="story_detail_added_to_bookmarks">Story added to bookmarks!</string>
     <string name="story_detail_removed_from_bookmarks">Story removed from bookmarks!</string>
+    <string name="open_story_in_browser">Open story in browser</string>
+    <string name="delete_story">Delete story</string>
+    <string name="story_deleted">Story deleted from database!</string>
+
+    <!--widget -->
+    <string name="widget_description">All stories widget</string>
+
+    <!--bookmarked-->
+    <string name="bookmarked">Bookmarked story</string>
+    <string name="un_bookmarked">Un bookmarked story</string>
+    <string name="add_to_bookmarks">Add to bookmarks</string>
+    <string name="remove_from_bookmarks">Remove from Bookmarks</string>
 
 </resources>

@@ -26,10 +26,12 @@ public class StoryDetailActivity extends AppCompatActivity {
             StoryDetailFragment detailFragment = new StoryDetailFragment();
             detailFragment.setArguments(args);
 
-            getSupportFragmentManager().beginTransaction().add(R.id.container, detailFragment)
+            getSupportFragmentManager().beginTransaction().add(R.id.story_detail_container, detailFragment)
                     .commit();
+
+            supportPostponeEnterTransition();
+
         }
     }
 
-    //onClickListener for Browser button - handles implicit intent.
 }

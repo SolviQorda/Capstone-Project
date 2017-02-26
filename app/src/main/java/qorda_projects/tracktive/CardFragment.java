@@ -1,6 +1,5 @@
 package qorda_projects.tracktive;
 
-import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
@@ -31,20 +30,17 @@ public class CardFragment extends Fragment{
 
     private static final String LOG_TAG = CardFragment.class.getSimpleName().toString();
     public final String DIALOG_TAG = "new card dialog";
+    public final String DELETE_TAG = "delete_cards_dialog";
+
 
     private StoryAdapter mStoryAdapter;
-    private int mChoiceMode;
     private ArrayList<Story> mStories;
-
-
 
     public interface Callback {
         public void onItemSelected(Uri singleStoryUri, StoryAdapter.StoryAdapterViewHolder vh);
     }
 
-
-
-    public static final CardFragment newInstance(String title, String keywords) {
+    public static final CardFragment newInstance() {
 
         CardFragment cardFragment = new CardFragment();
 
@@ -59,11 +55,9 @@ public class CardFragment extends Fragment{
             if(b != null) {
                 mStories = b.getParcelableArrayList("cardStoriesArrayList");
                 Log.v(LOG_TAG, "mStories taken from SIS bundle " + mStories);
-
             }
         }
     }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -74,8 +68,6 @@ public class CardFragment extends Fragment{
         RecyclerView mCardRecyclerView = (RecyclerView) rootView.findViewById(R.id.recyclerview_cards);
         LinearLayoutManager llm = new LinearLayoutManager(getActivity());
         mCardRecyclerView.setLayoutManager(llm);
-
-        //Testing to see if bundle is passed from MainActivity
 
         //empty view
         View emptyView = rootView.findViewById(R.id.recyclerview_stories_empty);
@@ -115,14 +107,10 @@ public class CardFragment extends Fragment{
                     openNewCardDialog();
                     return true;
                 }
-                else if (id == R.id.diary_view) {
-                    Intent diaryIntent = new Intent(getContext(), DiaryActivity.class);
-                    getContext().startActivity(diaryIntent);
+                else if(id == R.id.delete_data) {
+                    Log.v(LOG_TAG, "delete all data called");
+                    deletedDataDialog();
                     return true;
-                }
-                else if (id == R.id.new_diary_entry) {
-//                    openNewDiaryEntryDialog
-                            return true;
                 }
                 return super.onMenuItemSelected(menuItem);
             }
@@ -135,8 +123,6 @@ public class CardFragment extends Fragment{
 
             }
         });
-
-
         return  rootView;
     }
 
@@ -149,8 +135,6 @@ public class CardFragment extends Fragment{
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-//        mStoryAdapter.onSaveInstanceState(outState);
-//        outState.putParcelable("localCardUri", mCardSpecificUri);
         super.onSaveInstanceState(outState);
     }
 
@@ -158,16 +142,27 @@ public class CardFragment extends Fragment{
     @Override
     public void onDestroy() {
         super.onDestroy();
-//        Bundle args = new Bundle();
-//        args.putParcelable("localCardUri", mCardSpecificUri);
-//        onSaveInstanceState(args);
     }
+
+    /**
+     * Opens a new card dialog
+     */
 
     public void openNewCardDialog() {
         DialogFragment newCardDialog = new KeywordsEntryDialog();
         FragmentManager manager = getActivity().getSupportFragmentManager();
         newCardDialog.show(manager, DIALOG_TAG);
 
+    }
+
+    /**
+     * Opens a delete all data dialog
+     */
+
+    public void deletedDataDialog() {
+        DeleteDataDialogFragment deleteDataDialogFragment = new DeleteDataDialogFragment();
+        FragmentManager manager = getActivity().getSupportFragmentManager();
+        deleteDataDialogFragment.show(manager, DELETE_TAG);
     }
 
 }

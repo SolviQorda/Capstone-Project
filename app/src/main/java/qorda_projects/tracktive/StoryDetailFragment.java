@@ -29,7 +29,6 @@ public class StoryDetailFragment extends Fragment implements LoaderManager.Loade
     private final String DETAIL_URI = "detailUri";
     private static final int STORY_DETAIL_LOADER = 0;
     private String mBookmarked;
-    private Story mStory;
 
 
     private static final String[] STORY_DETAIL_COLUMNS = {
@@ -58,6 +57,7 @@ public class StoryDetailFragment extends Fragment implements LoaderManager.Loade
     private TextView mSourceView;
     private ImageButton mOpenBrowserButton;
     private ImageButton mBookmarkButton;
+    private ImageButton mDeleteButton;
 
 
     @Override
@@ -75,6 +75,7 @@ public class StoryDetailFragment extends Fragment implements LoaderManager.Loade
         mSourceView = (TextView) rootView.findViewById(R.id.story_detail_source_text);
         mOpenBrowserButton = (ImageButton) rootView.findViewById(R.id.story_detail_browser_icon);
         mBookmarkButton = (ImageButton) rootView.findViewById(R.id.story_detail_bookmark_icon);
+        mDeleteButton = (ImageButton) rootView.findViewById(R.id.story_detail_delete_icon);
 
         return rootView;
     }
@@ -101,20 +102,60 @@ public class StoryDetailFragment extends Fragment implements LoaderManager.Loade
     }
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        if(data != null && data.moveToFirst())
-        {
+        if(data != null && data.moveToFirst()) {
             String title = data.getString(COL_STORY_TITLE);
             String content = data.getString(COL_STORY_CONTENT);
             final String storyurl = data.getString(COL_STORY_URL);
             String source = data.getString(COL_STORY_SOURCE);
             String date = data.getString(COL_STORY_DATE);
-            mBookmarked = data.getString(COL_STORY_BOOKMARKED);
-            int tabNumber = data.getInt(COL_STORY_TAB_NUMBER);
+            String bookmarked = data.getString(COL_STORY_BOOKMARKED);
 
             mTitleView.setText(title);
             mContentView.setText(content);
             mSourceView.setText(source);
             mDateView.setText(date);
+            setBookmarkedButtonContent(bookmarked);
+
+            mOpenBrowserButton.setContentDescription(getResources().getString(R.string.open_story_in_browser));
+            mOpenBrowserButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent watchIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(storyurl));
+                    getContext().startActivity(watchIntent);
+
+
+                }
+            });
+        }
+
+        mDeleteButton.setContentDescription(getResources().getString(R.string.delete_story));
+
+            mDeleteButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    deleteStory();
+                }
+            });
+        }
+
+    /**
+     * Sets the drawable resource for the bookmark ImageButton based on the value return from DB.
+     * Then changes drawable and updates DB if onClick triggered.
+     * @param bookmarked
+     *
+     */
+
+
+            public void setBookmarkedButtonContent(String bookmarked) {
+            if (bookmarked.equals("0")) {
+                mBookmarkButton.setContentDescription(getResources().getString(R.string.add_to_bookmarks));
+                mBookmarkButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_bookmark_black_48dp));
+
+            } else if (bookmarked.equals("1")) {
+                mBookmarkButton.setContentDescription(getResources().getString(R.string.remove_from_bookmarks));
+                mBookmarkButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_bookmark_green));
+            }
+
 
             mBookmarkButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -132,10 +173,11 @@ public class StoryDetailFragment extends Fragment implements LoaderManager.Loade
                         getContext().getContentResolver().update(mUri, bookmarkValue, mSelectectionClause, selectionArgs);
                         mBookmarkButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_bookmark_green));
                         Toast.makeText(getContext(), getResources().getString(R.string.story_detail_added_to_bookmarks), Toast.LENGTH_SHORT).show();
+
                         mBookmarked = "1";
                         bookmarkValue.clear();
 
-                    } else if(mBookmarked.equals("1")) {
+                    } else if (mBookmarked.equals("1")) {
                         bookmarkValue.put(CardsContract.CardEntry.COLUMN_BOOKMARKED, "0");
                         getContext().getContentResolver().update(mUri, bookmarkValue, mSelectectionClause, selectionArgs);
                         mBookmarkButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_bookmark_black_48dp));
@@ -147,17 +189,21 @@ public class StoryDetailFragment extends Fragment implements LoaderManager.Loade
 
                 }
             });
-
-            mOpenBrowserButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Intent watchIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(storyurl));
-                    getContext().startActivity(watchIntent);
-
-
-                }
-            });
         }
+
+    /**
+     * Deletes the selected story
+     */
+
+
+    public void deleteStory() {
+        //delete story from db
+        String mSelectectionClause = CardsContract.CardEntry._ID + " = ?";
+        String mStoryId = mUri.getPathSegments().get(1);
+        String[] selectionArgs = {mStoryId};
+        getContext().getContentResolver().delete(mUri, mSelectectionClause, selectionArgs);
+        Toast.makeText(getContext(), getResources().getString(R.string.story_deleted), Toast.LENGTH_SHORT).show();
+
     }
 
     @Override

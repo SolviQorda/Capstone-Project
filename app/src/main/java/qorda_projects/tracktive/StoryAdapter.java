@@ -1,13 +1,14 @@
 package qorda_projects.tracktive;
 
 import android.content.Context;
+import android.media.Image;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -37,7 +38,7 @@ public class StoryAdapter extends RecyclerView.Adapter<StoryAdapter.StoryAdapter
         public final TextView mTitleView;
         public final TextView mDateView;
         public final TextView mSourceView;
-        public final ImageButton mBookmarked;
+        public final ImageView mBookmarked;
 
         public StoryAdapterViewHolder(View view) {
             super(view);
@@ -45,7 +46,7 @@ public class StoryAdapter extends RecyclerView.Adapter<StoryAdapter.StoryAdapter
             mTitleView = (TextView) view.findViewById(R.id.card_story_title);
             mDateView = (TextView) view.findViewById(R.id.card_list_date);
             mSourceView = (TextView) view.findViewById(R.id.card_story_source);
-            mBookmarked = (ImageButton) view.findViewById(R.id.list_item_bookmark_icon);
+            mBookmarked = (ImageView) view.findViewById(R.id.list_item_bookmark_icon);
             view.setOnClickListener(this);
         }
 
@@ -107,6 +108,13 @@ public class StoryAdapter extends RecyclerView.Adapter<StoryAdapter.StoryAdapter
 
         String bookmarked = story.getBookmarked();
         int drawableId = Utility.bookmarkedOrNot(bookmarked);
+        String bookmarkedString = mContext.getString(R.string.bookmarked);
+        String unBookmarkedString = mContext.getString(R.string.un_bookmarked);
+        if(bookmarked.equals("1")){
+            storyAdapterViewHolder.mBookmarked.setContentDescription(bookmarkedString);
+        } else {
+            storyAdapterViewHolder.mBookmarked.setContentDescription(unBookmarkedString);
+        }
 
         storyAdapterViewHolder.mBookmarked.setImageDrawable(mContext.getDrawable(drawableId));
 

@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "913921431457",
+    "firebase_url": "https://fir-tracktive.firebaseio.com",
+    "project_id": "firebase-tracktive",
+    "storage_bucket": "firebase-tracktive.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:913921431457:android:ec1a45391913dbee",
+        "android_client_info": {
+          "package_name": "qorda_projects.tracktive.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "913921431457-ouajforbkqn92iagk6v0qp7f0m88r4bo.apps.googleusercontent.com",
+          "client_type": 3
+        },
+        {
+          "client_id": "913921431457-hgbe2qo1harn2hlcbs40tjbrekc5j7f9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAajgqZLVAOOxTRFbCYIoRXllELgL2SQBQ"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

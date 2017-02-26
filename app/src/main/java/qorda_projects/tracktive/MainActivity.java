@@ -21,29 +21,29 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import qorda_projects.tracktive.data.CardsContract;
 import qorda_projects.tracktive.sync.TracktiveSyncAdapter;
 
-public class MainActivity extends AppCompatActivity implements KeywordsEntryDialog.keywordsDialogListener, LoaderManager.LoaderCallbacks<Cursor>, CardFragment.Callback {
+public class MainActivity extends AppCompatActivity implements KeywordsEntryDialog.keywordsDialogListener, DeleteDataDialogFragment.deleteDialogListener, LoaderManager.LoaderCallbacks<Cursor>, CardFragment.Callback {
 
     public final String DIALOG_TAG = "new card dialog";
     public final String DETAIL_URI = "detailUri";
     private final String LOG_TAG = MainActivity.class.getSimpleName().toString();
+    private static final String STORYDETAILFRAGMENT_TAG = "SDFTAG";
     private ViewPager mViewPager;
-    private PagerAdapter mPagerAdapter;
     private TabLayout mTabLayout;
-    private SharedPreferences mSharedPreferences;
-    private ArrayList<Card> mTitlesAndKeywords;
-    private List<CardFragment> mFragments;
-    private ArrayList<Story> mStories;
-    private Uri mUri;
+    private boolean mTwoPane;
+    private AdView mAdView;
+
 
     private static final int STORY_LOADER = 0;
 
@@ -78,6 +78,15 @@ public class MainActivity extends AppCompatActivity implements KeywordsEntryDial
         Toolbar toolbar = (Toolbar) findViewById(R.id.main_toolbar);
         setSupportActionBar(toolbar);
 
+        MobileAds.initialize(getApplicationContext(), getString(R.string.google_app_id));
+        mAdView = (AdView) findViewById(R.id.adView);
+
+        AdRequest adRequest = new AdRequest.Builder()
+                .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
+                .addTestDevice(getString(R.string.google_app_id))
+                .build();
+        mAdView.loadAd(adRequest);
+
         getSupportLoaderManager().initLoader(0, null, this);
 
         //If no pre-existing data then need to open up the dialog.
@@ -90,56 +99,35 @@ public class MainActivity extends AppCompatActivity implements KeywordsEntryDial
         }
 
         //handle whether to go to 2-pane mode or not here
-//        if (savedInstanceState == null) {
-//            CardFragment cardFragment = new CardFragment();
-//            if (cardUri != null) {
-//                Bundle uriArgs = new Bundle();
-//                uriArgs.putParcelable(CardFragment.CARD_URI, cardUri);
-//                cardFragment.setArguments(uriArgs);
-//            }
-//            getSupportFragmentManager().beginTransaction()
-//        }
-//        }
-//        CardFragment cardFragment = ((CardFragment) getSupportFragmentManager()
-//                .findFragmentById(R.id.stories_fragment));
+        if(findViewById(R.id.story_detail_container) != null) {
+            //if thsi view is present, then activity should be in 2-pane mode
+            mTwoPane = true;
+        } else {
+            mTwoPane = false;
+        }
 
-        TabLayout tabLayout = getTabLayout();
-        final ViewPager viewPager = getViewPager();
 
-        viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
-        tabLayout.setTabMode(TabLayout.MODE_SCROLLABLE);
+        mTabLayout = getTabLayout();
+        mViewPager = getViewPager();
 
-        //cycle through card titles (for tabs).
+        mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(
+                mTabLayout));
+        mTabLayout.setTabMode(TabLayout.MODE_SCROLLABLE);
 
-if (existingCardDetails != null ) {
-    for (int i = 0; i < existingCardDetails.size(); i++) {
-        Card card = existingCardDetails.get(i);
-        String tabTitle = card.getTitle();
-        addTab(tabTitle);
-    }
-}
-        tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+        if (existingCardDetails != null ) {
+            for (int i = 0; i < existingCardDetails.size(); i++) {
+                Card card = existingCardDetails.get(i);
+                String tabTitle = card.getTitle();
+                addTab(tabTitle);
+            }
+        }
+        mTabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
 
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 //need to deliver this to the card fragment, how do I set it?
 
-                viewPager.setCurrentItem(tab.getPosition());
-//                int tabNumber = tab.getPosition();
-//                ArrayList<Story> storiesForFragment = new ArrayList<Story>();
-//                for(int i = 0; i <mStories.size(); i++) {
-//                    Story story = mStories.get(i);
-//                    int storyTabNumber = story.getTabNumber();
-//                    if(storyTabNumber == tabNumber) {
-//                        storiesForFragment.add(story);
-//                    }
-//                    CardFragment cardFragment = mFragments.get(tabNumber);
-//                    Bundle args = new Bundle();
-//                    args.putParcelableArrayList("cardStoriesArrayList", storiesForFragment);
-//                    cardFragment.setArguments(args);
-
-//                }
-                //set cardFragment with bundle arrayList
+                mViewPager.setCurrentItem(tab.getPosition());
             }
 
             @Override
@@ -154,9 +142,7 @@ if (existingCardDetails != null ) {
 
             TracktiveSyncAdapter.initializeSyncAdapter(this);
 
-
         }
-
     }
 
     @Override
@@ -167,25 +153,6 @@ if (existingCardDetails != null ) {
     @Override
     public void onStop() {
         super.onStop();
-    }
-
-    public void onItemSelected(Uri contentUri) {
-//        if(mTwoPane) {
-//            Bundle args = new Bundle();
-//
-//            args.putParcelable("URI", contentUri);
-//
-//            DetailFragment fragment = new DetailFragment();
-//            fragment.setArguments(args);
-//
-//            getSupportFragmentManager().beginTransaction()
-//                    .replace(R.id.movie_detail_container, fragment, DETAILFRAGMENT_TAG)
-//                    .commit();
-//        } else {
-            Intent intent = new Intent(this, StoryDetailActivity.class)
-                    .setData(contentUri);
-            startActivity(intent);
-//        }
     }
 
     //Content Loader classes
@@ -237,12 +204,9 @@ if (existingCardDetails != null ) {
                 TracktiveSyncAdapter.syncImmediately(this);
             }
 
-//        mStoryAdapter.swapCursor(cursor);
             if (cursor.getCount() == 0) {
                 this.supportStartPostponedEnterTransition();
 
-            } else {
-                //loop through existing stories
             }
         }
     }
@@ -256,7 +220,6 @@ if (existingCardDetails != null ) {
 
         getSupportLoaderManager().initLoader(0, null, this);
         //recreating the activity for the new card.
-        this.recreate();
     }
 
     private void setPagerAdapter(ArrayList<CardFragment> fragments) {
@@ -304,7 +267,15 @@ if (existingCardDetails != null ) {
         return super.onOptionsItemSelected(item);
     }
 
+/**
+ * Returns a Arraylist of cardFragments and sets a Parcelable Array List of stories to each fragment
+ * @param cardDetails an arrayList of card titles and keywords
+ * @param stories an arrayList of all stories returned from API call.
+ *
+ */
+
     private ArrayList<CardFragment> updateCardFragments(ArrayList<Card> cardDetails, ArrayList<Story> stories) {
+        clearTabs();
         ArrayList<CardFragment> cardFragmentList = new ArrayList<CardFragment>();
 
         if (cardDetails != null) {
@@ -312,7 +283,6 @@ if (existingCardDetails != null ) {
             for (int i = 0; i < cardDetails.size(); i++) {
                 Card card = cardDetails.get(i);
                 String cardTitle = card.getTitle();
-                String cardKeywords = card.getKeywords();
                 Log.v(LOG_TAG, "at position " + i + " cardTitle: " + cardTitle);
                 //add tab
                 addTab(cardTitle);
@@ -324,13 +294,21 @@ if (existingCardDetails != null ) {
                     args.putParcelableArrayList("cardStoriesArrayList", storiesForFragment);
                 }
                     // add cardFragment to list of fragments
-                CardFragment cardFragment = CardFragment.newInstance(cardTitle, cardKeywords);
+                CardFragment cardFragment = CardFragment.newInstance();
                 cardFragment.setArguments(args);
                 cardFragmentList.add(cardFragment);
             }
         }
         return cardFragmentList;
     }
+
+    /**
+     * Returns a Arraylist of stories that match the relevant tab.
+     * @param tabNumber the id of the tab
+     * @param allStories an arrayList of all stories returned from API call.
+     *
+     */
+
 
     private ArrayList<Story> getStoriesForTabNumber(int tabNumber, ArrayList<Story> allStories) {
         ArrayList<Story> storiesForFragment = new ArrayList<Story>();
@@ -345,6 +323,14 @@ if (existingCardDetails != null ) {
         }
         return storiesForFragment;
     }
+    private void clearTabs() {
+        mTabLayout.removeAllTabs();
+    }
+
+    /**
+     * Returns a Arraylist of Card objects from sharedPreferences.
+     * @param context
+     */
 
     public static ArrayList<Card> getExistingCardDetails(Context context) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
@@ -359,14 +345,36 @@ if (existingCardDetails != null ) {
     }
 
     @Override
-    public void onItemSelected(Uri singleStoryUri, StoryAdapter.StoryAdapterViewHolder vh){
-//        if (mTwoPane) {}
-//        else {
+    public void onItemSelected(Uri singleStoryUri, StoryAdapter.StoryAdapterViewHolder vh) {
+        if (mTwoPane) {
+            Bundle args = new Bundle();
+            Log.v(LOG_TAG, "mTwoPane: " + mTwoPane);
 
-        Log.v(LOG_TAG, "single story uri in MA: " + singleStoryUri);
-        Intent intent = new Intent(this, StoryDetailActivity.class)
-                .setData(singleStoryUri);
-        startActivity(intent);
+            args.putParcelable(DETAIL_URI, singleStoryUri);
+
+            StoryDetailFragment fragment = new StoryDetailFragment();
+            fragment.setArguments(args);
+
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.story_detail_container, fragment, STORYDETAILFRAGMENT_TAG)
+                    .commit();
+        } else {
+
+            Log.v(LOG_TAG, "single story uri in MA: " + singleStoryUri);
+            Intent intent = new Intent(this, StoryDetailActivity.class)
+                    .setData(singleStoryUri);
+            startActivity(intent);
+        }
+    }
+
+    /**
+     * Recreates MainActivity after DeleteDialog is called with Positive button press.
+     *
+     */
+
+    public void recreateActivityAfterDeleteCall() {
+        MainActivity.this.recreate();
+
     }
 
 
