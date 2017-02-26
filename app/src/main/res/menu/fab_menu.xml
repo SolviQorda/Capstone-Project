@@ -6,13 +6,9 @@
         android:title="@string/make_card" />
 
     <item
-        android:id="@+id/new_diary_entry"
-        android:icon="@drawable/ic_plus_white_48dp"
-        android:title="@string/new_diary_entry"/>
+        android:id="@+id/delete_data"
+        android:icon="@drawable/ic_delete_black_48dp"
+        android:title="@string/delete_all_cards"/>
 
-    <item
-        android:id="@+id/diary_view"
-        android:icon="@drawable/diary_icon"
-        android:title="@string/diary_view"/>
 
 </menu>

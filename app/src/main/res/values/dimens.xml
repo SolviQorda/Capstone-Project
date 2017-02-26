@@ -25,6 +25,6 @@
     <dimen name="widget_default_resize_height">40dp</dimen>
     <dimen name="widget_default_resize_width">40dp</dimen>
 
-    <dimen name="two_pane_story_top_margin">40dp</dimen>
+    <dimen name="two_pane_story_top_margin">100dp</dimen>
 
 </resources>

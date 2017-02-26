@@ -33,23 +33,13 @@ public class CardDbHelper extends SQLiteOpenHelper{
                 CardsContract.CardEntry.COLUMN_TAB_NUMBER + " INTEGER NOT NULL" +
                 " );";
 
-        final String SQL_CREATE_DIARY_TABLE = "CREATE TABLE " + CardsContract.DiaryEntry.TABLE_NAME + " (" +
-                CardsContract.DiaryEntry._ID + " INTEGER PRIMARY KEY," +
-                CardsContract.DiaryEntry.COLUMN_TITLE + " TEXT NOT NULL," +
-                CardsContract.DiaryEntry.COLUMN_DATE + " TEXT NOT NULL," +
-                CardsContract.DiaryEntry.COLUMN_CONTENT + " TEXT NOT NULL," +
-                CardsContract.DiaryEntry.COLUMN_CARD_KEYWORDS + " TEXT NOT NULL " +
-                " );";
-
         sqlitedatabase.execSQL(SQL_CREATE_CARDS_TABLE);
-        sqlitedatabase.execSQL(SQL_CREATE_DIARY_TABLE);
 
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion) {
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + CardsContract.CardEntry.TABLE_NAME);
-        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + CardsContract.DiaryEntry.TABLE_NAME);
         onCreate(sqLiteDatabase);
 
     }

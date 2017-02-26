@@ -62,7 +62,11 @@ public class CardWidgetRemoteViewsService extends RemoteViewsService{
 
             @Override
             public int getCount() {
-                return data.getCount();
+                if(data!=null) {
+                    return data.getCount();
+                } else {
+                    return 0;
+                }
             }
 
             @Override

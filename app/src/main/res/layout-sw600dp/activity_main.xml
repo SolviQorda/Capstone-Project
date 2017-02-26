@@ -4,6 +4,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:ads="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="qorda_projects.tracktive.MainActivity">
@@ -79,7 +80,7 @@
     </android.support.v4.view.ViewPager>
 
     <android.support.v4.widget.Space
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="match_parent"
         android:id="@+id/cardviewAligner"
         android:layout_alignLeft="@id/layout_center"
@@ -94,14 +95,22 @@
 
     <FrameLayout
 android:id="@+id/story_detail_container"
-android:layout_width="0dp"
+android:layout_width="match_parent"
 android:layout_height="match_parent"
-android:layout_alignLeft="@+id/cardviewAligner"
-android:layout_alignRight="@+id/cardviewAligner"
-android:layout_alignEnd="@id/cardviewAligner"
-android:layout_alignBottom="@+id/cardviewAligner"
-android:layout_alignTop="@+id/cardviewAligner"
+android:layout_alignLeft="@+id/layout_center"
+android:layout_alignStart="@id/layout_center"
 android:layout_marginTop="@dimen/two_pane_story_top_margin"
 />
 
-    </RelativeLayout>
+    <com.google.android.gms.ads.AdView
+        android:id="@+id/adView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_gravity="bottom|center"
+        ads:adSize="BANNER"
+        ads:adUnitId="@string/adUnitId"
+    />
+
+
+</RelativeLayout>

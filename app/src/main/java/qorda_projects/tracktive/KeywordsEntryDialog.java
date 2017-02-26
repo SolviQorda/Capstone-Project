@@ -5,7 +5,6 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.util.Log;
@@ -18,7 +17,6 @@ import com.google.gson.reflect.TypeToken;
 
 import java.util.ArrayList;
 
-import qorda_projects.tracktive.data.CardsContract;
 import qorda_projects.tracktive.sync.TracktiveSyncAdapter;
 
 import static android.preference.PreferenceManager.getDefaultSharedPreferences;
@@ -45,7 +43,7 @@ public class KeywordsEntryDialog extends DialogFragment {
 
 
     // use this instance of interface to deliver action events
-    keywordsDialogListener mListener;
+    private keywordsDialogListener mKeywordsDialogListener;
 
     //Override onAttach to instantiate the Listener
     @Override
@@ -55,7 +53,7 @@ public class KeywordsEntryDialog extends DialogFragment {
         //verify that host activity implements the callback interface
         try {
             //instantiate the listender so that we can send events to the host
-            mListener = (keywordsDialogListener) activity;
+            mKeywordsDialogListener = (keywordsDialogListener) activity;
         } catch (ClassCastException e) {
             // if this happens the activity doesn't implement the interface so throw an exception
             throw new ClassCastException(activity.toString() + " must implement keywordsDialogListener");
@@ -133,10 +131,8 @@ public class KeywordsEntryDialog extends DialogFragment {
                         //now you have new keywords you need to make an api call
                         TracktiveSyncAdapter.syncImmediately(getContext());
 
-                        Uri cardForKeywordUri = CardsContract.CardEntry.buildSingleCardUri(keywordsFromUser);
-                        Log.v(LOG_TAG, "cards Uri:" + cardForKeywordUri);
 
-                        mListener.initLoaderForNewCard();
+                        mKeywordsDialogListener.initLoaderForNewCard();
 
                     }
                 })
