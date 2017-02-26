@@ -88,7 +88,7 @@ public class StoryDetailFragment extends Fragment implements LoaderManager.Loade
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        if (null != mUri) {
+        if (mUri != null) {
 
             return new CursorLoader(getActivity(),
                     mUri,
